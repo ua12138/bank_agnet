@@ -1,0 +1,15 @@
+.git
+.gitignore
+.venv
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_tmp/
+.artifacts/
+.agents/
+data/runtime/
+data/*.db
+docs/spec/
+demotest/
+tests/

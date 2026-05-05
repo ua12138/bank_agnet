@@ -1,0 +1,74 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: hz-aiops-postgres
+    environment:
+      POSTGRES_DB: aiops
+      POSTGRES_USER: aiops
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aiops}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aiops -d aiops"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: hz-aiops:${IMAGE_TAG:-latest}
+    container_name: hz-aiops-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      HZ_AIOPS_ENV: prod
+      HZ_AIOPS_TASK_DB_KIND: postgres
+      HZ_AIOPS_POSTGRES_DSN: postgresql://aiops:${POSTGRES_PASSWORD:-aiops}@postgres:5432/aiops
+      HZ_AIOPS_WORKFLOW_ENGINE: langgraph
+      HZ_AIOPS_LANGGRAPH_FALLBACK_TO_CLASSIC: "true"
+      HZ_AIOPS_ENABLE_DEDUP: "true"
+      HZ_AIOPS_ENABLE_HUMAN_APPROVAL: "true"
+      HZ_AIOPS_REACT_COT_ENABLED: "false"
+      HZ_AIOPS_RAG_MCP_BASE_URL: ${HZ_AIOPS_RAG_MCP_BASE_URL:-http://host.docker.internal:8091}
+      HZ_AIOPS_FEISHU_WEBHOOK_URL: ${HZ_AIOPS_FEISHU_WEBHOOK_URL:-}
+      HZ_AIOPS_WORKER_ID: diag-worker-1
+      HZ_AIOPS_WORKER_POLL_INTERVAL_SEC: "1.0"
+    ports:
+      - "8088:8088"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8088/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  worker:
+    image: hz-aiops:${IMAGE_TAG:-latest}
+    container_name: hz-aiops-worker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      api:
+        condition: service_started
+    environment:
+      HZ_AIOPS_ENV: prod
+      HZ_AIOPS_TASK_DB_KIND: postgres
+      HZ_AIOPS_POSTGRES_DSN: postgresql://aiops:${POSTGRES_PASSWORD:-aiops}@postgres:5432/aiops
+      HZ_AIOPS_WORKFLOW_ENGINE: langgraph
+      HZ_AIOPS_LANGGRAPH_FALLBACK_TO_CLASSIC: "true"
+      HZ_AIOPS_ENABLE_DEDUP: "true"
+      HZ_AIOPS_ENABLE_HUMAN_APPROVAL: "true"
+      HZ_AIOPS_REACT_COT_ENABLED: "false"
+      HZ_AIOPS_RAG_MCP_BASE_URL: ${HZ_AIOPS_RAG_MCP_BASE_URL:-http://host.docker.internal:8091}
+      HZ_AIOPS_FEISHU_WEBHOOK_URL: ${HZ_AIOPS_FEISHU_WEBHOOK_URL:-}
+      HZ_AIOPS_WORKER_ID: diag-worker-1
+      HZ_AIOPS_WORKER_POLL_INTERVAL_SEC: "1.0"
+    command: ["python", "-m", "hz_bank_aiops.worker.runner"]
+    restart: unless-stopped
+
+volumes:
+  pg_data:

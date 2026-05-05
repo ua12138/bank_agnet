@@ -1,0 +1,88 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: hz-aiops-dev-postgres
+    environment:
+      POSTGRES_DB: aiops
+      POSTGRES_USER: aiops
+      POSTGRES_PASSWORD: aiops
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_dev_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aiops -d aiops"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hz-aiops-dev-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      HZ_AIOPS_ENV: dev
+      HZ_AIOPS_TASK_DB_KIND: postgres
+      HZ_AIOPS_POSTGRES_DSN: postgresql://aiops:aiops@postgres:5432/aiops
+      HZ_AIOPS_WORKFLOW_ENGINE: langgraph
+      HZ_AIOPS_LANGGRAPH_FALLBACK_TO_CLASSIC: "true"
+      HZ_AIOPS_ENABLE_DEDUP: "true"
+      HZ_AIOPS_ENABLE_HUMAN_APPROVAL: "true"
+      HZ_AIOPS_REACT_COT_ENABLED: "true"
+      HZ_AIOPS_REACT_COT_MAX_CHARS: "240"
+      HZ_AIOPS_REACT_COT_MAX_ENTRIES: "16"
+      HZ_AIOPS_RAG_MCP_BASE_URL: http://host.docker.internal:8091
+      HZ_AIOPS_FEISHU_WEBHOOK_URL: ""
+      HZ_AIOPS_WORKER_ID: diag-worker-dev-1
+    ports:
+      - "8088:8088"
+    volumes:
+      - ./:/app
+    command:
+      [
+        "python",
+        "-m",
+        "uvicorn",
+        "hz_bank_aiops.api.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8088",
+        "--reload",
+      ]
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hz-aiops-dev-worker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      api:
+        condition: service_started
+    environment:
+      HZ_AIOPS_ENV: dev
+      HZ_AIOPS_TASK_DB_KIND: postgres
+      HZ_AIOPS_POSTGRES_DSN: postgresql://aiops:aiops@postgres:5432/aiops
+      HZ_AIOPS_WORKFLOW_ENGINE: langgraph
+      HZ_AIOPS_LANGGRAPH_FALLBACK_TO_CLASSIC: "true"
+      HZ_AIOPS_ENABLE_DEDUP: "true"
+      HZ_AIOPS_ENABLE_HUMAN_APPROVAL: "true"
+      HZ_AIOPS_REACT_COT_ENABLED: "true"
+      HZ_AIOPS_REACT_COT_MAX_CHARS: "240"
+      HZ_AIOPS_REACT_COT_MAX_ENTRIES: "16"
+      HZ_AIOPS_RAG_MCP_BASE_URL: http://host.docker.internal:8091
+      HZ_AIOPS_FEISHU_WEBHOOK_URL: ""
+      HZ_AIOPS_WORKER_ID: diag-worker-dev-1
+      HZ_AIOPS_WORKER_POLL_INTERVAL_SEC: "0.5"
+    command: ["python", "-m", "hz_bank_aiops.worker.runner"]
+    volumes:
+      - ./:/app
+
+volumes:
+  pg_dev_data:

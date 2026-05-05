@@ -1,0 +1,35 @@
+[
+  {
+    "incident_id": "inc_20250801_001",
+    "system": "payment-system",
+    "service": "payment-api",
+    "severity": "high",
+    "event_count": 17,
+    "window_start": "2025-08-01T10:10:00Z",
+    "window_end": "2025-08-01T10:15:00Z",
+    "hosts": ["db-prod-01", "api-prod-01", "gw-prod-01"],
+    "metrics": [
+      {"metric": "mysql.connections", "value": 980},
+      {"metric": "api.timeout.rate", "value": 6.7},
+      {"metric": "gateway.5xx.rate", "value": 4.1}
+    ],
+    "recent_change_ids": ["chg_1001"],
+    "status": "NEW"
+  },
+  {
+    "incident_id": "inc_20250801_002",
+    "system": "credit-system",
+    "service": "credit-api",
+    "severity": "critical",
+    "event_count": 9,
+    "window_start": "2025-08-01T10:20:00Z",
+    "window_end": "2025-08-01T10:25:00Z",
+    "hosts": ["credit-db-01", "credit-api-01"],
+    "metrics": [
+      {"metric": "mysql.connections", "value": 1100},
+      {"metric": "api.timeout.rate", "value": 9.4}
+    ],
+    "recent_change_ids": ["chg_2001"],
+    "status": "NEW"
+  }
+]

@@ -1,0 +1,2 @@
+{"change_id":"chg_1001","system":"payment-system","service":"payment-api","owner":"release-bot","summary":"payment-api release 2025.08.01-01","change_time":"2025-08-01T10:05:00Z"}
+{"change_id":"chg_1002","system":"payment-system","service":"payment-api","owner":"dba-team","summary":"hot index add order table","change_time":"2025-08-01T09:50:00Z"}

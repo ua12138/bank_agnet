@@ -1,0 +1,138 @@
+openapi: 3.0.3
+info:
+  title: HZ Bank AIOps Incident Diagnosis API
+  version: 1.0.0
+servers:
+  - url: http://127.0.0.1:8088
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        "200": {description: OK}
+
+  /api/v1/incidents:
+    post:
+      summary: Submit one incident into diagnosis task queue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IncidentSubmitRequest"
+      responses:
+        "200": {description: OK}
+
+  /api/v1/tasks:
+    get:
+      summary: List diagnosis tasks
+      parameters:
+        - in: query
+          name: limit
+          schema: {type: integer, default: 50}
+      responses:
+        "200": {description: OK}
+
+  /api/v1/tasks/{task_id}:
+    get:
+      summary: Get one diagnosis task
+      parameters:
+        - in: path
+          name: task_id
+          required: true
+          schema: {type: integer}
+      responses:
+        "200": {description: OK}
+
+  /api/v1/workers/run-once:
+    post:
+      summary: Trigger worker to process one task
+      responses:
+        "200": {description: OK}
+
+  /api/v1/approvals/{incident_id}:
+    get:
+      summary: Get approval record
+      parameters:
+        - in: path
+          name: incident_id
+          required: true
+          schema: {type: string}
+      responses:
+        "200": {description: OK}
+    post:
+      summary: Submit approval decision
+      parameters:
+        - in: path
+          name: incident_id
+          required: true
+          schema: {type: string}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApprovalDecisionRequest"
+      responses:
+        "200": {description: OK}
+
+  /api/v1/rag/health:
+    get:
+      summary: Check RAG MCP health
+      responses:
+        "200": {description: OK}
+
+components:
+  schemas:
+    IncidentMetric:
+      type: object
+      required: [metric, value]
+      properties:
+        metric: {type: string}
+        value: {type: number}
+    IncidentPayload:
+      type: object
+      required:
+        - incident_id
+        - system
+        - service
+        - severity
+        - event_count
+        - window_start
+        - window_end
+        - hosts
+        - metrics
+      properties:
+        incident_id: {type: string}
+        system: {type: string}
+        service: {type: string}
+        severity: {type: string, enum: [low, medium, high, critical]}
+        event_count: {type: integer}
+        window_start: {type: string, format: date-time}
+        window_end: {type: string, format: date-time}
+        hosts:
+          type: array
+          items: {type: string}
+        metrics:
+          type: array
+          items: {$ref: "#/components/schemas/IncidentMetric"}
+        recent_change_ids:
+          type: array
+          items: {type: string}
+        status: {type: string, default: NEW}
+    IncidentSubmitRequest:
+      type: object
+      required: [incident]
+      properties:
+        incident:
+          $ref: "#/components/schemas/IncidentPayload"
+        priority: {type: string, default: P2}
+    ApprovalDecisionRequest:
+      type: object
+      required: [status, approver]
+      properties:
+        status: {type: string, enum: [approved, rejected]}
+        approver: {type: string}
+        comment: {type: string}
+

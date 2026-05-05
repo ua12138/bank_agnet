@@ -1,0 +1,530 @@
+{
+  "learn_while_reading": {
+    "project_demo.py": [
+      "approval_flow",
+      "mcp_tool",
+      "notify_flow",
+      "react_tool_trace",
+      "status_machine"
+    ],
+    ".agents\\shared\\concept_utils.py": [
+      "approval_flow",
+      "async_handler",
+      "context_builder",
+      "embedding",
+      "generator",
+      "langgraph_conditional_edge",
+      "langgraph_edge",
+      "langgraph_node",
+      "mcp_prompt",
+      "mcp_resource",
+      "mcp_tool",
+      "notify_flow",
+      "react_tool_trace",
+      "retry_and_failure",
+      "route_decorator",
+      "run_forever",
+      "run_once",
+      "status_machine",
+      "streaming",
+      "vectorstore",
+      "window"
+    ],
+    ".agents\\shared\\project_indexer.py": [
+      "vectorstore"
+    ],
+    ".agents\\skills\\code-path-explainer\\scripts\\make_path_report.py": [
+      "approval_flow",
+      "mcp_tool",
+      "notify_flow",
+      "react_tool_trace",
+      "run_forever",
+      "run_once",
+      "status_machine",
+      "window"
+    ],
+    ".agents\\skills\\project-reading-coach\\scripts\\classify_concepts.py": [
+      "approval_flow",
+      "context_builder",
+      "embedding",
+      "mcp_prompt",
+      "mcp_resource",
+      "mcp_tool",
+      "notify_flow",
+      "react_tool_trace",
+      "run_forever",
+      "run_once",
+      "status_machine",
+      "streaming",
+      "vectorstore",
+      "window"
+    ],
+    ".agents\\skills\\project-reading-coach\\scripts\\make_project_demo.py": [
+      "approval_flow",
+      "mcp_tool",
+      "notify_flow",
+      "react_tool_trace",
+      "status_machine"
+    ],
+    ".agents\\skills\\project-reading-coach\\scripts\\make_reading_guide.py": [
+      "approval_flow",
+      "mcp_tool",
+      "notify_flow",
+      "react_tool_trace",
+      "retry_and_failure",
+      "run_forever",
+      "run_once",
+      "status_machine",
+      "window"
+    ],
+    "demotest\\app\\db.py": [
+      "context_builder",
+      "status_machine"
+    ],
+    "demotest\\app\\main.py": [
+      "mcp_tool",
+      "route_decorator",
+      "run_once",
+      "window"
+    ],
+    "demotest\\app\\react_tools.py": [
+      "embedding",
+      "mcp_tool",
+      "status_machine",
+      "window"
+    ],
+    "demotest\\app\\worker.py": [
+      "mcp_tool",
+      "run_once"
+    ],
+    "scripts\\run_worker_once.py": [
+      "run_once"
+    ],
+    "src\\hz_bank_aiops\\config.py": [
+      "approval_flow",
+      "mcp_tool",
+      "notify_flow",
+      "window"
+    ],
+    "src\\hz_bank_aiops\\agent\\langgraph_react.py": [
+      "context_builder",
+      "langgraph_conditional_edge",
+      "langgraph_edge",
+      "langgraph_node",
+      "mcp_tool"
+    ],
+    "src\\hz_bank_aiops\\agent\\react_agent.py": [
+      "context_builder",
+      "mcp_tool",
+      "react_tool_trace",
+      "streaming",
+      "window"
+    ],
+    "src\\hz_bank_aiops\\api\\main.py": [
+      "approval_flow",
+      "mcp_tool",
+      "route_decorator",
+      "run_once",
+      "status_machine"
+    ],
+    "src\\hz_bank_aiops\\mcp\\rag_client.py": [
+      "mcp_tool",
+      "status_machine"
+    ],
+    "src\\hz_bank_aiops\\models\\schemas.py": [
+      "approval_flow",
+      "mcp_tool",
+      "notify_flow",
+      "react_tool_trace",
+      "status_machine",
+      "window"
+    ],
+    "src\\hz_bank_aiops\\models\\__init__.py": [
+      "approval_flow",
+      "mcp_tool",
+      "notify_flow",
+      "status_machine"
+    ],
+    "src\\hz_bank_aiops\\notifier\\feishu.py": [
+      "notify_flow",
+      "status_machine"
+    ],
+    "src\\hz_bank_aiops\\notifier\\__init__.py": [
+      "notify_flow"
+    ],
+    "src\\hz_bank_aiops\\service\\control_center.py": [
+      "approval_flow",
+      "status_machine",
+      "window"
+    ],
+    "src\\hz_bank_aiops\\service\\runtime.py": [
+      "approval_flow",
+      "mcp_tool",
+      "notify_flow",
+      "retry_and_failure",
+      "status_machine",
+      "window"
+    ],
+    "src\\hz_bank_aiops\\service\\workflow.py": [
+      "approval_flow",
+      "langgraph_conditional_edge",
+      "langgraph_edge",
+      "langgraph_node",
+      "status_machine"
+    ],
+    "src\\hz_bank_aiops\\storage\\task_store.py": [
+      "approval_flow",
+      "context_builder",
+      "mcp_tool",
+      "notify_flow",
+      "react_tool_trace",
+      "retry_and_failure",
+      "status_machine"
+    ],
+    "src\\hz_bank_aiops\\tools\\base.py": [
+      "mcp_tool"
+    ],
+    "src\\hz_bank_aiops\\tools\\ops_tools.py": [
+      "mcp_tool"
+    ],
+    "src\\hz_bank_aiops\\tools\\__init__.py": [
+      "mcp_tool"
+    ],
+    "src\\hz_bank_aiops\\worker\\runner.py": [
+      "run_forever",
+      "run_once"
+    ],
+    "tests\\test_control_center.py": [
+      "window"
+    ],
+    "tests\\test_demotest_flow.py": [
+      "mcp_tool",
+      "run_once"
+    ],
+    "tests\\test_runtime_flow.py": [
+      "approval_flow",
+      "status_machine",
+      "window"
+    ],
+    "tests\\test_task_store.py": [
+      "notify_flow",
+      "status_machine",
+      "window"
+    ],
+    "tests\\test_worker_runner.py": [
+      "approval_flow",
+      "run_once",
+      "status_machine",
+      "window"
+    ],
+    "flinksql\\02_incident_aggregation.sql": [
+      "window"
+    ],
+    "flinksql\\03_task_sink_postgres.sql": [
+      "notify_flow",
+      "status_machine",
+      "window"
+    ],
+    "flinksql\\04_doris_sink.sql": [
+      "window"
+    ],
+    "sql\\postgres_schema.sql": [
+      "approval_flow",
+      "mcp_tool",
+      "notify_flow",
+      "react_tool_trace",
+      "status_machine"
+    ],
+    "PROJECT_READING_GUIDE.md": [
+      "approval_flow",
+      "mcp_tool",
+      "notify_flow",
+      "react_tool_trace",
+      "retry_and_failure",
+      "run_forever",
+      "run_once",
+      "status_machine",
+      "window"
+    ],
+    ".agents\\skills\\code-path-explainer\\SKILL.md": [
+      "mcp_tool"
+    ],
+    ".agents\\skills\\project-reading-coach\\SKILL.md": [
+      "mcp_tool"
+    ],
+    ".agents\\skills\\project-reading-coach\\examples\\sample_output.md": [
+      "run_once"
+    ],
+    "demotest\\docs\\RUNBOOK.md": [
+      "mcp_tool"
+    ],
+    "docs\\ACCEPTANCE.md": [
+      "approval_flow",
+      "notify_flow",
+      "status_machine"
+    ],
+    "docs\\PROJECT_READING_GUIDE.md": [
+      "approval_flow",
+      "mcp_tool",
+      "notify_flow",
+      "react_tool_trace",
+      "retry_and_failure",
+      "run_forever",
+      "run_once",
+      "status_machine",
+      "window"
+    ],
+    "docs\\README.md": [
+      "approval_flow",
+      "mcp_tool"
+    ],
+    "docs\\spec.md": [
+      "approval_flow",
+      "mcp_tool",
+      "notify_flow",
+      "status_machine",
+      "window"
+    ],
+    "docs\\demotest\\RUNBOOK.md": [
+      "mcp_tool"
+    ],
+    "docs\\spec\\ACCEPTANCE.md": [
+      "approval_flow",
+      "notify_flow",
+      "status_machine"
+    ],
+    "docs\\spec\\DEV_SPEC.md": [
+      "approval_flow",
+      "mcp_tool",
+      "notify_flow",
+      "status_machine"
+    ],
+    "docs\\spec\\openapi.yaml": [
+      "approval_flow",
+      "status_machine",
+      "window"
+    ],
+    "pyproject.toml": [
+      "mcp_tool"
+    ]
+  },
+  "must_understand_first": {
+    "project_demo.py": [
+      "task_claiming"
+    ],
+    ".agents\\shared\\concept_utils.py": [
+      "aggregate",
+      "dependency_injection",
+      "fastapi_app",
+      "fastapi_router",
+      "langgraph_stategraph",
+      "mcp_dispatch",
+      "mcp_server",
+      "pydantic_model",
+      "pydantic_validation",
+      "reranker",
+      "retriever",
+      "sink",
+      "source",
+      "task_claiming",
+      "transform",
+      "workflow_execute",
+      "workflow_invoke"
+    ],
+    ".agents\\shared\\path_utils.py": [
+      "source"
+    ],
+    ".agents\\shared\\project_indexer.py": [
+      "mcp_server",
+      "retriever"
+    ],
+    ".agents\\skills\\code-path-explainer\\scripts\\make_path_report.py": [
+      "pydantic_validation",
+      "sink",
+      "task_claiming",
+      "workflow_execute"
+    ],
+    ".agents\\skills\\project-reading-coach\\scripts\\classify_concepts.py": [
+      "aggregate",
+      "langgraph_stategraph",
+      "mcp_dispatch",
+      "mcp_server",
+      "reranker",
+      "retriever",
+      "sink",
+      "source",
+      "transform"
+    ],
+    ".agents\\skills\\project-reading-coach\\scripts\\make_project_demo.py": [
+      "task_claiming"
+    ],
+    ".agents\\skills\\project-reading-coach\\scripts\\make_reading_guide.py": [
+      "pydantic_validation",
+      "sink",
+      "task_claiming",
+      "workflow_execute"
+    ],
+    "demotest\\app\\db.py": [
+      "workflow_execute"
+    ],
+    "demotest\\app\\main.py": [
+      "fastapi_app",
+      "mcp_server"
+    ],
+    "demotest\\app\\react_tools.py": [
+      "mcp_server"
+    ],
+    "demotest\\app\\settings.py": [
+      "mcp_server"
+    ],
+    "scripts\\seed_incidents.py": [
+      "pydantic_validation"
+    ],
+    "src\\hz_bank_aiops\\config.py": [
+      "mcp_server"
+    ],
+    "src\\hz_bank_aiops\\agent\\langgraph_react.py": [
+      "langgraph_stategraph",
+      "workflow_invoke"
+    ],
+    "src\\hz_bank_aiops\\agent\\react_agent.py": [
+      "mcp_server",
+      "pydantic_model"
+    ],
+    "src\\hz_bank_aiops\\api\\main.py": [
+      "fastapi_app",
+      "pydantic_model"
+    ],
+    "src\\hz_bank_aiops\\mcp\\rag_client.py": [
+      "mcp_server"
+    ],
+    "src\\hz_bank_aiops\\mcp\\__init__.py": [
+      "mcp_server"
+    ],
+    "src\\hz_bank_aiops\\models\\schemas.py": [
+      "pydantic_model",
+      "source"
+    ],
+    "src\\hz_bank_aiops\\service\\runtime.py": [
+      "mcp_server",
+      "pydantic_validation",
+      "task_claiming",
+      "workflow_execute"
+    ],
+    "src\\hz_bank_aiops\\service\\workflow.py": [
+      "langgraph_stategraph",
+      "workflow_execute",
+      "workflow_invoke"
+    ],
+    "src\\hz_bank_aiops\\storage\\task_store.py": [
+      "task_claiming",
+      "workflow_execute"
+    ],
+    "src\\hz_bank_aiops\\tools\\ops_tools.py": [
+      "mcp_server",
+      "source"
+    ],
+    "tests\\test_demotest_flow.py": [
+      "mcp_server"
+    ],
+    "tests\\test_mcp_client.py": [
+      "mcp_server"
+    ],
+    "tests\\test_task_store.py": [
+      "task_claiming"
+    ],
+    "flinksql\\01_sources.sql": [
+      "source"
+    ],
+    "flinksql\\02_incident_aggregation.sql": [
+      "source"
+    ],
+    "flinksql\\03_task_sink_postgres.sql": [
+      "sink"
+    ],
+    "flinksql\\04_doris_sink.sql": [
+      "sink"
+    ],
+    "PROJECT_READING_GUIDE.md": [
+      "pydantic_validation",
+      "sink",
+      "task_claiming",
+      "workflow_execute"
+    ],
+    "demotest\\docs\\RUNBOOK.md": [
+      "mcp_server"
+    ],
+    "docs\\ACCEPTANCE.md": [
+      "mcp_server",
+      "sink",
+      "source"
+    ],
+    "docs\\PROJECT_READING_GUIDE.md": [
+      "pydantic_validation",
+      "sink",
+      "task_claiming"
+    ],
+    "docs\\README.md": [
+      "mcp_server",
+      "sink",
+      "source"
+    ],
+    "docs\\spec.md": [
+      "mcp_server",
+      "sink",
+      "source"
+    ],
+    "docs\\demotest\\RUNBOOK.md": [
+      "mcp_server"
+    ],
+    "docs\\spec\\ACCEPTANCE.md": [
+      "mcp_server",
+      "sink",
+      "source"
+    ],
+    "docs\\spec\\DEV_SPEC.md": [
+      "mcp_server",
+      "sink",
+      "source"
+    ],
+    "docs\\spec\\openapi.yaml": [
+      "mcp_server"
+    ]
+  },
+  "can_ignore_temporarily": {
+    ".agents\\shared\\concept_utils.py": [
+      "mcp_client",
+      "retrieval"
+    ],
+    "demotest\\app\\react_tools.py": [
+      "mcp_client"
+    ],
+    "src\\hz_bank_aiops\\api\\main.py": [
+      "mcp_client"
+    ],
+    "src\\hz_bank_aiops\\mcp\\rag_client.py": [
+      "mcp_client"
+    ],
+    "src\\hz_bank_aiops\\mcp\\__init__.py": [
+      "mcp_client"
+    ],
+    "src\\hz_bank_aiops\\notifier\\feishu.py": [
+      "mcp_client"
+    ],
+    "src\\hz_bank_aiops\\service\\runtime.py": [
+      "mcp_client"
+    ],
+    "src\\hz_bank_aiops\\tools\\ops_tools.py": [
+      "mcp_client"
+    ],
+    "tests\\test_mcp_client.py": [
+      "mcp_client"
+    ],
+    "docs\\spec.md": [
+      "mcp_client"
+    ],
+    "docs\\spec\\DEV_SPEC.md": [
+      "mcp_client"
+    ]
+  }
+}

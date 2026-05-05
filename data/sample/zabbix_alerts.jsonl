@@ -1,0 +1,4 @@
+{"event_id":"evt_1001","source":"zabbix","host":"db-prod-01","service":"payment-api","system":"payment-system","metric":"mysql.connections","value":980,"severity":"high","timestamp":"2025-08-01T10:15:30Z","message":"MySQL connections too high"}
+{"event_id":"evt_1002","source":"zabbix","host":"api-prod-01","service":"payment-api","system":"payment-system","metric":"api.timeout.rate","value":6.7,"severity":"high","timestamp":"2025-08-01T10:15:40Z","message":"API timeout rate rises"}
+{"event_id":"evt_1003","source":"zabbix","host":"gw-prod-01","service":"payment-api","system":"payment-system","metric":"gateway.5xx.rate","value":4.1,"severity":"high","timestamp":"2025-08-01T10:15:45Z","message":"Gateway 5xx rate rises"}
+{"event_id":"evt_1004","source":"zabbix","host":"db-prod-01","service":"payment-api","system":"payment-system","metric":"mysql.slow_queries","value":52,"severity":"critical","timestamp":"2025-08-01T10:16:00Z","message":"Slow SQL spike"}

@@ -1,3 +1,5 @@
+"""???????????????????"""
+
 from __future__ import annotations
 
 """运维诊断工具集。
@@ -20,6 +22,7 @@ class ZabbixMetricsTool(Tool):
 
     def run(self, payload: dict[str, Any]) -> dict[str, Any]:
         # 输入统一约定：payload["incident"] 为 Incident 字典
+        """run??????????????????????????"""
         incident = payload.get("incident", {})
         hosts = incident.get("hosts", [])
         # 返回结构要稳定，便于 LLM 在 observation 中做模式识别
@@ -40,6 +43,7 @@ class DorisHistoryTool(Tool):
     description = "Lookup historical incidents and diagnosis results in doris"
 
     def run(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """run??????????????????????????"""
         incident = payload.get("incident", {})
         service = incident.get("service", "")
         return {
@@ -62,6 +66,7 @@ class XueLangChangeTool(Tool):
     description = "Lookup recent deployment changes from xuelang"
 
     def run(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """run??????????????????????????"""
         incident = payload.get("incident", {})
         changes = incident.get("recent_change_ids", [])
         return {
@@ -80,10 +85,12 @@ class RagCaseTool(Tool):
     description = "Query MCP RAG service for similar cases"
 
     def __init__(self, rag_client: RagMCPClient, kb_id: str = "hz-bank-demo") -> None:
+        """????????????????????"""
         self.rag_client = rag_client
         self.kb_id = kb_id
 
     def run(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """run??????????????????????????"""
         incident = payload.get("incident", {})
         system = incident.get("system", "")
         service = incident.get("service", "")

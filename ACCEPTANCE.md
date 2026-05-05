@@ -1,11 +1,10 @@
-# ACCEPTANCE
+﻿# ACCEPTANCE
 
-该文件已迁移为兼容入口，主版本在：
+主验收文档请使用：
 - `docs/ACCEPTANCE.md`
 
-相关文档：
+关联文档：
 - `docs/README.md`
-- `docs/spec.md`
-- `docs/spec/DEV_SPEC.md`
+- `PROJECT_READING_GUIDE.md`
+- `docs/CODE_COMMENT_GUIDE.md`
 - `docs/spec/openapi.yaml`
-- `docs/demotest/RUNBOOK.md`

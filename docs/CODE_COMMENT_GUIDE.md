@@ -1,41 +1,27 @@
-# 代码中文注释说明
+﻿# 代码中文注释规范（BANK_AGENT）
 
-## 1. 本次补充范围
-本次已为以下核心代码补充中文注释，且不改变业务逻辑：
+## 1. 目标
+- 让新手能在 10~20 分钟内看懂模块用途和主链路。
+- 不改业务逻辑，只增强可读性。
 
-- `src/hz_bank_aiops/config.py`
-- `src/hz_bank_aiops/models/schemas.py`
-- `src/hz_bank_aiops/storage/factory.py`
-- `src/hz_bank_aiops/storage/task_store.py`
-- `src/hz_bank_aiops/service/control_center.py`
-- `src/hz_bank_aiops/service/workflow.py`
-- `src/hz_bank_aiops/service/runtime.py`
-- `src/hz_bank_aiops/agent/react_agent.py`
-- `src/hz_bank_aiops/agent/langgraph_react.py`
-- `src/hz_bank_aiops/tools/base.py`
-- `src/hz_bank_aiops/tools/ops_tools.py`
-- `src/hz_bank_aiops/mcp/rag_client.py`
-- `src/hz_bank_aiops/notifier/feishu.py`
-- `src/hz_bank_aiops/api/main.py`
-- `src/hz_bank_aiops/worker/runner.py`
-- `scripts/run_worker_once.py`
-- `scripts/seed_incidents.py`
-- `demotest/app/*.py`（main/worker/react_tools/db/settings）
+## 2. 覆盖标准
+- 模块级：每个 `.py` 文件都有中文模块说明。
+- 类级：每个类都有职责说明。
+- 函数级：关键函数说明输入、输出、异常路径。
+- 复杂逻辑：补充状态流转、重试（retry）、并发（concurrency）、幂等（idempotency）说明。
 
-## 2. 注释风格约定
-- 模块级注释：说明该文件在整条链路中的职责。
-- 类/函数注释：解释输入输出、关键副作用与异常处理策略。
-- 关键分支注释：只针对复杂逻辑（去重、审批、重试、降级、并发抢占）添加。
-- 不添加“翻译式废话注释”，避免噪声。
+## 3. 文风标准
+- 使用“中英并列”术语，例如：任务认领（claim）、编排（workflow）、重试（retry）。
+- 避免翻译式废话，优先解释“为什么这样做”。
+- 注释与代码不一致时，以代码行为为准并更新注释。
 
-## 3. 重点链路注释位置
-- Flink 下游任务消费：`worker/runner.py`、`service/runtime.py`
-- 编排层（去重/审批/ReAct）：`service/workflow.py`、`service/control_center.py`
-- ReAct 推理环：`agent/react_agent.py`、`agent/langgraph_react.py`
-- 工具调用与外部集成：`tools/ops_tools.py`、`mcp/rag_client.py`、`notifier/feishu.py`
-- 持久化与重试语义：`storage/task_store.py`
+## 4. 本次改造范围
+- 已覆盖：`src/`、`demotest/app/`、`tests/`、`scripts/` 的 Python 文件注释。
+- 已同步：`PROJECT_READING_GUIDE.md`（新手导读）与关键文档中文化。
+- 排除：`__pycache__/`、`*.pyc`、`*.egg-info/`、`*.db` 等生成产物。
 
-## 4. 后续维护建议
-- 新增模块时，至少包含 1 段模块注释 + 公开函数注释。
-- 任何状态机/重试/并发逻辑变更，必须同步更新对应注释。
-- 当注释与代码不一致时，以代码为准并立即修注释。
+## 5. 自检清单
+- 是否每个目标 Python 文件都有模块说明？
+- 是否关键类/函数都有中文说明？
+- 是否主链路（API -> Runtime -> Workflow -> Store）已标清？
+- 是否无乱码字符（如 `?`）？

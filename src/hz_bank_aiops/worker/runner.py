@@ -1,3 +1,5 @@
+"""Worker ??????????????????"""
+
 from __future__ import annotations
 
 """Worker 入口。
@@ -17,6 +19,7 @@ class WorkerRunner:
     """Worker 运行器。"""
 
     def __init__(self, runtime: DiagnosisRuntime, worker_id: str, poll_interval_sec: float = 1.0) -> None:
+        """????????????????????"""
         self.runtime = runtime
         self.worker_id = worker_id
         self.poll_interval_sec = poll_interval_sec

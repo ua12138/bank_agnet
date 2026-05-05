@@ -1,3 +1,5 @@
+"""???????????????????"""
+
 from __future__ import annotations
 
 """LangGraph 版 ReAct 执行器。
@@ -19,6 +21,7 @@ class LangGraphReactUnavailableError(RuntimeError):
 
 
 class _ReActState(TypedDict, total=False):
+    """_ReActState???????????????????"""
     incident: dict[str, Any]
     # 滑动窗口步骤，仅供 planner 使用
     steps: list[ToolTraceStep]
@@ -50,6 +53,7 @@ class LangGraphReActExecutor:
         summary_max_chars: int = 480,
         summary_max_entries: int = 12,
     ) -> None:
+        """????????????????????"""
         self.agent = agent
         self.max_steps = max_steps
 
@@ -65,6 +69,7 @@ class LangGraphReActExecutor:
         self.graph = self._build_graph()
 
     def _build_graph(self):
+        """_build_graph??????????????????????????"""
         try:
             from langgraph.graph import END, START, StateGraph
         except ImportError as exc:
@@ -73,6 +78,7 @@ class LangGraphReActExecutor:
             ) from exc
 
         def plan(state: _ReActState) -> _ReActState:
+            """plan??????????????????????????"""
             window_steps = list(state.get("steps", []))
             all_steps = list(state.get("all_steps", []))
             cot_trace = list(state.get("cot_trace", []))
@@ -130,6 +136,7 @@ class LangGraphReActExecutor:
             }
 
         def act(state: _ReActState) -> _ReActState:
+            """act??????????????????????????"""
             window_steps = list(state.get("steps", []))
             all_steps = list(state.get("all_steps", []))
             cot_trace = list(state.get("cot_trace", []))
@@ -194,9 +201,11 @@ class LangGraphReActExecutor:
             }
 
         def route_after_plan(state: _ReActState) -> str:
+            """route_after_plan??????????????????????????"""
             return "end" if state.get("done", False) else "act"
 
         def route_after_act(state: _ReActState) -> str:
+            """route_after_act??????????????????????????"""
             return "plan" if not state.get("done", False) else "end"
 
         graph = StateGraph(_ReActState)
@@ -208,6 +217,7 @@ class LangGraphReActExecutor:
         return graph.compile()
 
     def run(self, incident: dict[str, Any]) -> DiagnosisResult:
+        """run??????????????????????????"""
         result = self.graph.invoke(
             {
                 "incident": incident,
@@ -240,6 +250,7 @@ class LangGraphReActExecutor:
         return diagnosis
 
     def _merge_summary(self, existing: str, overflow_steps: list[ToolTraceStep]) -> str:
+        """_merge_summary??????????????????????????"""
         lines = [line for line in existing.split("\n") if line.strip()] if existing else []
         for step in overflow_steps:
             status = "ok" if step.observation.get("ok") else "error"
@@ -256,26 +267,31 @@ class LangGraphReActExecutor:
         return self._clip_with_limit(merged, self.summary_max_chars)
 
     def _append_cot(self, cot_trace: list[str], line: str) -> list[str]:
+        """_append_cot??????????????????????????"""
         cot_trace.append(self._clip(line))
         if len(cot_trace) > self.cot_max_entries:
             return cot_trace[-self.cot_max_entries :]
         return cot_trace
 
     def _clip(self, text: str) -> str:
+        """_clip??????????????????????????"""
         if len(text) <= self.cot_max_chars:
             return text
         return text[: self.cot_max_chars - 3] + "..."
 
     def _clip_with_limit(self, text: str, max_chars: int) -> str:
+        """_clip_with_limit??????????????????????????"""
         if len(text) <= max_chars:
             return text
         return text[: max_chars - 3] + "..."
 
     def _clip_summary_line(self, text: str) -> str:
+        """_clip_summary_line??????????????????????????"""
         line_limit = max(120, self.summary_max_chars // 2)
         return self._clip_with_limit(text, line_limit)
 
     def _compact_observation(self, observation: dict[str, Any]) -> str:
+        """_compact_observation??????????????????????????"""
         if not observation:
             return "empty observation"
         if observation.get("ok") is False and observation.get("error"):

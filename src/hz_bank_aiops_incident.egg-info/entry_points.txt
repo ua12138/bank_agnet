@@ -1,3 +1,0 @@
-[console_scripts]
-hz-aiops-api = hz_bank_aiops.api.main:run
-hz-aiops-worker = hz_bank_aiops.worker.runner:run_worker_cli

@@ -1,3 +1,5 @@
+"""???????????????????"""
+
 from __future__ import annotations
 
 """经典 ReAct Agent 实现（无外部 LLM 依赖的可运行版本）。"""
@@ -115,6 +117,7 @@ class ReActAgent:
     """经典 ReAct 循环执行器。"""
 
     def __init__(self, tools: list[Tool], max_steps: int = 6) -> None:
+        """????????????????????"""
         self.tools = {tool.name: tool for tool in tools}
         self.max_steps = max_steps
         self.planner = MockOpsPlanner()

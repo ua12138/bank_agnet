@@ -1,0 +1,24 @@
+﻿# Python cache / bytecode
+__pycache__/
+*.py[cod]
+
+# Packaging artifacts
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Test/cache artifacts
+.pytest_cache/
+.pytest_tmp/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual env
+.venv/
+
+# Local runtime databases
+data/runtime/*.db
+demotest/*.db

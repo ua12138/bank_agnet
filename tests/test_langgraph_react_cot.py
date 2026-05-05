@@ -1,3 +1,5 @@
+"""???????????????????????????"""
+
 from __future__ import annotations
 
 import shutil
@@ -11,14 +13,18 @@ from hz_bank_aiops.service import DiagnosisRuntime
 
 
 class LangGraphReActCoTTestCase(unittest.TestCase):
+    """LangGraphReActCoTTestCase???????????????????"""
     def setUp(self) -> None:
+        """setUp??????????????????????????"""
         self.tmp_dir = Path(".pytest_tmp") / f"langgraph_cot_{uuid.uuid4().hex}"
         self.tmp_dir.mkdir(parents=True, exist_ok=True)
 
     def tearDown(self) -> None:
+        """tearDown??????????????????????????"""
         shutil.rmtree(self.tmp_dir, ignore_errors=True)
 
     def _build_runtime(self, cot_enabled: bool) -> DiagnosisRuntime:
+        """_build_runtime??????????????????????????"""
         settings = Settings(
             task_db_kind="sqlite",
             sqlite_path=str((self.tmp_dir / f"runtime_{uuid.uuid4().hex}.db").resolve()),
@@ -36,6 +42,7 @@ class LangGraphReActCoTTestCase(unittest.TestCase):
         return runtime
 
     def _incident(self, incident_id: str) -> IncidentPayload:
+        """_incident??????????????????????????"""
         return IncidentPayload(
             incident_id=incident_id,
             system="payment-system",
@@ -50,6 +57,7 @@ class LangGraphReActCoTTestCase(unittest.TestCase):
         )
 
     def test_langgraph_writes_cot_trace_when_enabled(self) -> None:
+        """test_langgraph_writes_cot_trace_when_enabled??????????????????????????"""
         runtime = self._build_runtime(cot_enabled=True)
         if runtime.resolved_workflow_engine != "langgraph":
             self.skipTest("langgraph is not installed in current test environment")
@@ -66,6 +74,7 @@ class LangGraphReActCoTTestCase(unittest.TestCase):
             self.assertLessEqual(len(line), 80)
 
     def test_langgraph_does_not_write_cot_trace_when_disabled(self) -> None:
+        """test_langgraph_does_not_write_cot_trace_when_disabled??????????????????????????"""
         runtime = self._build_runtime(cot_enabled=False)
         if runtime.resolved_workflow_engine != "langgraph":
             self.skipTest("langgraph is not installed in current test environment")

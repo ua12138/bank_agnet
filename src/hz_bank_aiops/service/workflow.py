@@ -1,3 +1,5 @@
+"""???????????????ReAct ????????"""
+
 from __future__ import annotations
 
 """诊断编排层。
@@ -26,6 +28,7 @@ class WorkflowUnavailableError(RuntimeError):
 
 
 class _IncidentState(TypedDict, total=False):
+    """_IncidentState???????????????????"""
     incident: IncidentPayload
     dedup_result: dict[str, Any]
     approval_status: ApprovalStatus
@@ -51,6 +54,7 @@ class IncidentDiagnosisWorkflow:
         react_summary_max_entries: int = 12,
     ) -> None:
         # 复用同一套 Agent 与控制中心，保证 classic/langgraph 逻辑一致
+        """????????????????????"""
         self.agent = agent
         self.control_center = control_center
         self.workflow_engine = workflow_engine
@@ -115,6 +119,7 @@ class IncidentDiagnosisWorkflow:
 
         def dedup_node(state: _IncidentState) -> _IncidentState:
             # 去重节点：不启用时返回“非重复”占位结果
+            """dedup_node??????????????????????????"""
             incident = state["incident"]
             if not self.enable_dedup:
                 return {"dedup_result": {"is_duplicate": False}}
@@ -122,14 +127,17 @@ class IncidentDiagnosisWorkflow:
 
         def route_after_dedup(state: _IncidentState) -> str:
             # 重复告警直接短路结束，非重复进入审批
+            """route_after_dedup??????????????????????????"""
             return "duplicate" if state.get("dedup_result", {}).get("is_duplicate") else "approval"
 
         def duplicate_node(state: _IncidentState) -> _IncidentState:
+            """duplicate_node??????????????????????????"""
             incident = state["incident"]
             dedup = state.get("dedup_result", {})
             return {"result": self._duplicate_result(incident, dedup)}
 
         def approval_node(state: _IncidentState) -> _IncidentState:
+            """approval_node??????????????????????????"""
             incident = state["incident"]
             row = self.control_center.ensure_approval(
                 incident=incident,
@@ -139,6 +147,7 @@ class IncidentDiagnosisWorkflow:
 
         def route_after_approval(state: _IncidentState) -> str:
             # 审批放行才进入 ReAct，否则进入 pending/rejected 分支
+            """route_after_approval??????????????????????????"""
             status = state.get("approval_status", ApprovalStatus.pending)
             if status in {ApprovalStatus.approved, ApprovalStatus.auto_approved}:
                 return "react"
@@ -147,12 +156,15 @@ class IncidentDiagnosisWorkflow:
             return "pending"
 
         def pending_node(state: _IncidentState) -> _IncidentState:
+            """pending_node??????????????????????????"""
             return {"result": self._pending_result(state["incident"])}
 
         def rejected_node(state: _IncidentState) -> _IncidentState:
+            """rejected_node??????????????????????????"""
             return {"result": self._rejected_result(state["incident"], "rejected by approver")}
 
         def react_node(state: _IncidentState) -> _IncidentState:
+            """react_node??????????????????????????"""
             result = self._react_diagnose(state["incident"], workflow_engine="langgraph")
             return {"result": result}
 

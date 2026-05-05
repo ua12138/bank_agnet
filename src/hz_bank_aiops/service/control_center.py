@@ -1,3 +1,5 @@
+"""???????????????????"""
+
 from __future__ import annotations
 
 """控制中心：负责去重判定与人工审批治理。"""
@@ -19,6 +21,7 @@ class IncidentControlCenter:
     """
 
     def __init__(self, store: TaskStore, dedup_window_sec: int = 300) -> None:
+        """????????????????????"""
         self.store = store
         self.dedup_window_sec = dedup_window_sec
         self._lock = Lock()

@@ -1,4 +1,4 @@
-# HZ Bank AIOps Incident Diagnosis Platform
+# Bank AIOps Incident Diagnosis Platform
 
 基于 Flink + Doris + LLM Agent 的智能运维事件诊断平台完整代码实现。
 

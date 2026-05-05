@@ -1,4 +1,4 @@
-"""???????????????????"""
+"""模块说明：该文件用于承载项目中的相关实现。"""
 
 from __future__ import annotations
 
@@ -13,15 +13,10 @@ from hz_bank_aiops.storage import TaskStore
 
 
 class IncidentControlCenter:
-    """诊断前置控制逻辑。
-
-    主要职责：
-    - 在时间窗内做重复告警抑制
-    - 根据严重级别决定自动审批或人工审批
-    """
+    """IncidentControlCenter：封装该领域职责，供上层流程统一调用。"""
 
     def __init__(self, store: TaskStore, dedup_window_sec: int = 300) -> None:
-        """????????????????????"""
+        """初始化对象：注入依赖并保存运行所需配置。"""
         self.store = store
         self.dedup_window_sec = dedup_window_sec
         self._lock = Lock()
@@ -29,7 +24,7 @@ class IncidentControlCenter:
         self._dedup_index: dict[str, deque[tuple[str, datetime]]] = defaultdict(deque)
 
     def check_duplicate(self, incident: IncidentPayload) -> dict:
-        """在去重窗口内检查是否与历史 incident 重复。"""
+        """check_duplicate：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         signature = self._signature(incident)
         now = self._to_utc(incident.window_end)
         window_start = now - timedelta(seconds=self.dedup_window_sec)
@@ -54,7 +49,7 @@ class IncidentControlCenter:
         }
 
     def ensure_approval(self, incident: IncidentPayload, enabled: bool) -> ApprovalRecord:
-        """确保 incident 有一条审批记录，并返回当前状态。"""
+        """ensure_approval：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         if not enabled:
             # 人工审批关闭时，统一自动放行
             record = ApprovalRecord(
@@ -98,7 +93,7 @@ class IncidentControlCenter:
         approver: str,
         comment: str = "",
     ) -> ApprovalRecord:
-        """提交人工审批结论。"""
+        """submit_approval：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         if status not in {ApprovalStatus.approved, ApprovalStatus.rejected}:
             raise ValueError("manual approval only supports approved/rejected")
         record = ApprovalRecord(
@@ -111,13 +106,13 @@ class IncidentControlCenter:
         return record
 
     def _signature(self, incident: IncidentPayload) -> str:
-        """生成去重签名。"""
+        """_signature：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         metric_keys = ",".join(sorted(item.metric for item in incident.metrics))
         hosts = ",".join(sorted(incident.hosts))
         return f"{incident.system}|{incident.service}|{incident.severity.value}|{hosts}|{metric_keys}"
 
     def _to_utc(self, dt: datetime) -> datetime:
-        """统一转为 UTC 时间，避免跨时区比较错误。"""
+        """_to_utc：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         if dt.tzinfo is None:
             return dt.replace(tzinfo=UTC)
         return dt.astimezone(UTC)

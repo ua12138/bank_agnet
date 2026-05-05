@@ -1,4 +1,4 @@
-"""???????????????????"""
+"""模块说明：该文件用于承载项目中的相关实现。"""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ import httpx
 
 @dataclass
 class RagCallResult:
-    """MCP 调用结果包装。"""
+    """RagCallResult：封装该领域职责，供上层流程统一调用。"""
 
     ok: bool
     data: dict[str, Any]
@@ -25,18 +25,15 @@ class RagCallResult:
 
 
 class RagMCPClient:
-    """
-    Client for sibling `hz_bank_rag` MCP wrapper service.
-    Unified protocol: `/tools/call` with `name` + `arguments`.
-    """
+    """RagMCPClient：封装该领域职责，供上层流程统一调用。"""
 
     def __init__(self, base_url: str, timeout_sec: float = 8.0) -> None:
-        """????????????????????"""
+        """初始化对象：注入依赖并保存运行所需配置。"""
         self.base_url = base_url.rstrip("/")
         self.timeout_sec = timeout_sec
 
     def health(self) -> RagCallResult:
-        """探测 MCP 服务健康状态。"""
+        """health：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         try:
             with httpx.Client(timeout=self.timeout_sec) as client:
                 resp = client.get(f"{self.base_url}/health")
@@ -46,7 +43,7 @@ class RagMCPClient:
             return RagCallResult(ok=False, data={}, error=str(exc))
 
     def query(self, kb_id: str, query: str, top_k: int = 5) -> RagCallResult:
-        """调用 RAG 检索工具。"""
+        """query：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
 
         payload = {
             "name": "rag.query",

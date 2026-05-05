@@ -1,4 +1,4 @@
-"""demotest 配置。"""
+"""模块说明：该文件用于承载项目中的相关实现。"""
 
 from pathlib import Path
 
@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class DemoSettings(BaseSettings):
-    """demo 运行参数。"""
+    """DemoSettings：封装该领域职责，供上层流程统一调用。"""
 
     sqlite_path: str = "./demotest/demo_runtime.db"
     rag_mcp_base_url: str = "http://127.0.0.1:8091"
@@ -23,10 +23,10 @@ class DemoSettings(BaseSettings):
 
     @property
     def sqlite_path_obj(self) -> Path:
-        """返回 sqlite 绝对路径。"""
+        """sqlite_path_obj：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         return Path(self.sqlite_path).resolve()
 
 
 def get_demo_settings() -> DemoSettings:
-    """读取 demo 配置。"""
+    """get_demo_settings：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
     return DemoSettings()

@@ -1,4 +1,4 @@
-"""??????????????????????????"""
+"""模块说明：该文件用于承载项目中的相关实现。"""
 
 from __future__ import annotations
 
@@ -13,16 +13,16 @@ from typing import Iterator
 
 
 class DemoSQLite:
-    """demo 任务表/结果表访问对象。"""
+    """DemoSQLite：封装该领域职责，供上层流程统一调用。"""
 
     def __init__(self, path: Path) -> None:
-        """????????????????????"""
+        """初始化对象：注入依赖并保存运行所需配置。"""
         self.path = path
         self.path.parent.mkdir(parents=True, exist_ok=True)
 
     @contextmanager
     def conn(self) -> Iterator[sqlite3.Connection]:
-        """sqlite 连接上下文。"""
+        """conn：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         conn = sqlite3.connect(self.path)
         conn.row_factory = sqlite3.Row
         try:
@@ -32,7 +32,7 @@ class DemoSQLite:
             conn.close()
 
     def init(self) -> None:
-        """初始化 demo 表结构。"""
+        """init：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         with self.conn() as c:
             c.executescript(
                 """
@@ -56,7 +56,7 @@ class DemoSQLite:
             )
 
     def insert_task(self, payload: dict) -> int:
-        """插入一条待处理任务。"""
+        """insert_task：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         now = datetime.now(UTC).isoformat()
         with self.conn() as c:
             cur = c.execute(
@@ -69,7 +69,7 @@ class DemoSQLite:
             return int(cur.lastrowid)
 
     def claim_task(self) -> sqlite3.Row | None:
-        """抢占最早 NEW 任务并更新为 PROCESSING。"""
+        """claim_task：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         now = datetime.now(UTC).isoformat()
         with self.conn() as c:
             row = c.execute(
@@ -81,13 +81,13 @@ class DemoSQLite:
             return row
 
     def mark_done(self, task_id: int) -> None:
-        """标记任务完成。"""
+        """mark_done：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         now = datetime.now(UTC).isoformat()
         with self.conn() as c:
             c.execute("UPDATE task SET status='DONE', updated_at=? WHERE id=?", (now, task_id))
 
     def save_result(self, incident_id: str, summary: str, reasoning: list[dict]) -> int:
-        """保存 pseudo ReAct 结果。"""
+        """save_result：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         now = datetime.now(UTC).isoformat()
         with self.conn() as c:
             cur = c.execute(
@@ -100,13 +100,13 @@ class DemoSQLite:
             return int(cur.lastrowid)
 
     def list_tasks(self) -> list[dict]:
-        """查看任务表。"""
+        """list_tasks：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         with self.conn() as c:
             rows = c.execute("SELECT * FROM task ORDER BY id DESC").fetchall()
             return [dict(row) for row in rows]
 
     def list_results(self) -> list[dict]:
-        """查看结果表。"""
+        """list_results：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         with self.conn() as c:
             rows = c.execute("SELECT * FROM result ORDER BY id DESC").fetchall()
             return [dict(row) for row in rows]

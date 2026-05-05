@@ -1,4 +1,4 @@
-"""????????? SQLite/PostgreSQL ??????????????"""
+"""模块说明：该文件用于承载项目中的相关实现。"""
 
 from __future__ import annotations
 
@@ -29,82 +29,82 @@ from hz_bank_aiops.models import (
 
 
 def _utcnow_str() -> str:
-    """统一生成 UTC 时间字符串。"""
+    """_utcnow_str：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
     return datetime.now(UTC).isoformat()
 
 
 def _priority_rank(priority: str) -> int:
-    """将优先级映射为可排序的数值（数值越小优先级越高）。"""
+    """_priority_rank：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
     mapping = {"P0": 0, "P1": 1, "P2": 2, "P3": 3}
     return mapping.get(priority.upper(), 2)
 
 
 class TaskStore(ABC):
-    """任务存储统一接口。"""
+    """TaskStore：封装该领域职责，供上层流程统一调用。"""
 
     @abstractmethod
     def init_schema(self) -> None:
-        """init_schema??????????????????????????"""
+        """init_schema：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         raise NotImplementedError
 
     @abstractmethod
     def enqueue_incident(self, payload: dict[str, Any], priority: str = "P2") -> int:
-        """enqueue_incident??????????????????????????"""
+        """enqueue_incident：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         raise NotImplementedError
 
     @abstractmethod
     def claim_next_task(self, worker_id: str) -> TaskClaimResult:
-        """claim_next_task??????????????????????????"""
+        """claim_next_task：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         raise NotImplementedError
 
     @abstractmethod
     def mark_done(self, task_id: int, notify_status: NotifyStatus) -> None:
-        """mark_done??????????????????????????"""
+        """mark_done：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         raise NotImplementedError
 
     @abstractmethod
     def mark_failed(self, task_id: int, error_message: str, retryable: bool) -> None:
-        """mark_failed??????????????????????????"""
+        """mark_failed：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         raise NotImplementedError
 
     @abstractmethod
     def save_result(self, result: DiagnosisResult) -> int:
-        """save_result??????????????????????????"""
+        """save_result：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         raise NotImplementedError
 
     @abstractmethod
     def get_task(self, task_id: int) -> DiagnosisTask | None:
-        """get_task??????????????????????????"""
+        """get_task：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         raise NotImplementedError
 
     @abstractmethod
     def list_tasks(self, limit: int = 50) -> list[DiagnosisTask]:
-        """list_tasks??????????????????????????"""
+        """list_tasks：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         raise NotImplementedError
 
     @abstractmethod
     def upsert_approval(self, record: ApprovalRecord) -> None:
-        """upsert_approval??????????????????????????"""
+        """upsert_approval：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         raise NotImplementedError
 
     @abstractmethod
     def get_approval(self, incident_id: str) -> ApprovalRecord | None:
-        """get_approval??????????????????????????"""
+        """get_approval：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         raise NotImplementedError
 
 
 class SQLiteTaskStore(TaskStore):
-    """基于 sqlite 的任务存储实现。"""
+    """SQLiteTaskStore：封装该领域职责，供上层流程统一调用。"""
 
     def __init__(self, db_path: Path, max_retry_default: int = 3) -> None:
-        """????????????????????"""
+        """初始化对象：注入依赖并保存运行所需配置。"""
         self.db_path = db_path
         self.max_retry_default = max_retry_default
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
 
     @contextmanager
     def _conn(self) -> Iterator[sqlite3.Connection]:
-        """连接上下文管理：自动提交并关闭。"""
+        """_conn：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
         try:
@@ -114,7 +114,7 @@ class SQLiteTaskStore(TaskStore):
             conn.close()
 
     def init_schema(self) -> None:
-        """初始化任务表、结果表、审批表。"""
+        """init_schema：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         with self._conn() as conn:
             conn.executescript(
                 """
@@ -167,10 +167,7 @@ class SQLiteTaskStore(TaskStore):
             )
 
     def enqueue_incident(self, payload: dict[str, Any], priority: str = "P2") -> int:
-        """入队一个 Incident。
-
-        幂等策略：同一 incident_id 若已有 NEW/PROCESSING 任务则直接返回旧 task_id。
-        """
+        """enqueue_incident：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         incident_id = str(payload.get("incident_id", ""))
         system_name = str(payload.get("system", "unknown-system"))
         service_name = str(payload.get("service", "unknown-service"))
@@ -213,7 +210,7 @@ class SQLiteTaskStore(TaskStore):
             return int(cur.lastrowid)
 
     def claim_next_task(self, worker_id: str) -> TaskClaimResult:
-        """按优先级和创建时间抢占一条待处理任务。"""
+        """claim_next_task：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         now = _utcnow_str()
         with self._conn() as conn:
             row = conn.execute(
@@ -262,7 +259,7 @@ class SQLiteTaskStore(TaskStore):
             return TaskClaimResult(claimed=True, task=task)
 
     def mark_done(self, task_id: int, notify_status: NotifyStatus) -> None:
-        """标记任务完成，同时记录通知状态。"""
+        """mark_done：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         now = _utcnow_str()
         with self._conn() as conn:
             conn.execute(
@@ -275,7 +272,7 @@ class SQLiteTaskStore(TaskStore):
             )
 
     def mark_failed(self, task_id: int, error_message: str, retryable: bool) -> None:
-        """标记任务失败，并按重试策略决定是否回到 NEW。"""
+        """mark_failed：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         now = _utcnow_str()
         with self._conn() as conn:
             row = conn.execute(
@@ -303,7 +300,7 @@ class SQLiteTaskStore(TaskStore):
             )
 
     def save_result(self, result: DiagnosisResult) -> int:
-        """落库诊断结果。"""
+        """save_result：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         with self._conn() as conn:
             cur = conn.execute(
                 """
@@ -336,7 +333,7 @@ class SQLiteTaskStore(TaskStore):
             return int(cur.lastrowid)
 
     def get_task(self, task_id: int) -> DiagnosisTask | None:
-        """按 id 查询单个任务。"""
+        """get_task：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         with self._conn() as conn:
             row = conn.execute(
                 "SELECT * FROM diagnosis_task WHERE id=?",
@@ -347,7 +344,7 @@ class SQLiteTaskStore(TaskStore):
             return self._row_to_task(row)
 
     def list_tasks(self, limit: int = 50) -> list[DiagnosisTask]:
-        """按 id 倒序查询最近任务。"""
+        """list_tasks：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         with self._conn() as conn:
             rows = conn.execute(
                 "SELECT * FROM diagnosis_task ORDER BY id DESC LIMIT ?",
@@ -356,7 +353,7 @@ class SQLiteTaskStore(TaskStore):
             return [self._row_to_task(row) for row in rows]
 
     def upsert_approval(self, record: ApprovalRecord) -> None:
-        """插入或更新审批记录（incident_id 唯一）。"""
+        """upsert_approval：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         with self._conn() as conn:
             conn.execute(
                 """
@@ -379,7 +376,7 @@ class SQLiteTaskStore(TaskStore):
             )
 
     def get_approval(self, incident_id: str) -> ApprovalRecord | None:
-        """查询审批记录。"""
+        """get_approval：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         with self._conn() as conn:
             row = conn.execute(
                 "SELECT * FROM approval_record WHERE incident_id=?",
@@ -397,7 +394,7 @@ class SQLiteTaskStore(TaskStore):
             )
 
     def _row_to_task(self, row: sqlite3.Row) -> DiagnosisTask:
-        """将数据库行转换为业务对象。"""
+        """_row_to_task：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         return DiagnosisTask(
             id=int(row["id"]),
             incident_id=row["incident_id"],
@@ -420,13 +417,10 @@ class SQLiteTaskStore(TaskStore):
 
 
 class PostgresTaskStore(TaskStore):
-    """
-    Production-grade task store for PostgreSQL.
-    Requires `psycopg` (v3).
-    """
+    """PostgresTaskStore：封装该领域职责，供上层流程统一调用。"""
 
     def __init__(self, dsn: str, max_retry_default: int = 3) -> None:
-        """????????????????????"""
+        """初始化对象：注入依赖并保存运行所需配置。"""
         self.dsn = dsn
         self.max_retry_default = max_retry_default
         try:
@@ -437,7 +431,7 @@ class PostgresTaskStore(TaskStore):
 
     @contextmanager
     def _conn(self):
-        """postgres 连接上下文管理。"""
+        """_conn：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         conn = self._psycopg.connect(self.dsn, autocommit=False)
         try:
             yield conn
@@ -446,7 +440,7 @@ class PostgresTaskStore(TaskStore):
             conn.close()
 
     def init_schema(self) -> None:
-        """初始化 PostgreSQL 表结构。"""
+        """init_schema：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         with self._conn() as conn:
             with conn.cursor() as cur:
                 cur.execute(
@@ -505,7 +499,7 @@ class PostgresTaskStore(TaskStore):
                 )
 
     def enqueue_incident(self, payload: dict[str, Any], priority: str = "P2") -> int:
-        """入队一个 Incident（带活动任务幂等检查）。"""
+        """enqueue_incident：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         incident_id = str(payload.get("incident_id", ""))
         system_name = str(payload.get("system", "unknown-system"))
         service_name = str(payload.get("service", "unknown-service"))
@@ -535,10 +529,7 @@ class PostgresTaskStore(TaskStore):
                 return int(cur.fetchone()[0])
 
     def claim_next_task(self, worker_id: str) -> TaskClaimResult:
-        """并发安全抢占任务。
-
-        使用 `FOR UPDATE SKIP LOCKED`，多 worker 可并行消费不同任务。
-        """
+        """claim_next_task：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         with self._conn() as conn:
             with conn.cursor() as cur:
                 cur.execute(
@@ -566,7 +557,7 @@ class PostgresTaskStore(TaskStore):
                 return TaskClaimResult(claimed=True, task=task)
 
     def mark_done(self, task_id: int, notify_status: NotifyStatus) -> None:
-        """标记任务完成。"""
+        """mark_done：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         with self._conn() as conn:
             with conn.cursor() as cur:
                 cur.execute(
@@ -579,7 +570,7 @@ class PostgresTaskStore(TaskStore):
                 )
 
     def mark_failed(self, task_id: int, error_message: str, retryable: bool) -> None:
-        """标记任务失败并执行重试判定。"""
+        """mark_failed：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         with self._conn() as conn:
             with conn.cursor() as cur:
                 cur.execute(
@@ -602,7 +593,7 @@ class PostgresTaskStore(TaskStore):
                 )
 
     def save_result(self, result: DiagnosisResult) -> int:
-        """写入诊断结果。"""
+        """save_result：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         with self._conn() as conn:
             with conn.cursor() as cur:
                 cur.execute(
@@ -629,7 +620,7 @@ class PostgresTaskStore(TaskStore):
                 return int(cur.fetchone()[0])
 
     def get_task(self, task_id: int) -> DiagnosisTask | None:
-        """查询单个任务。"""
+        """get_task：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         with self._conn() as conn:
             with conn.cursor() as cur:
                 cur.execute(
@@ -667,7 +658,7 @@ class PostgresTaskStore(TaskStore):
                 )
 
     def list_tasks(self, limit: int = 50) -> list[DiagnosisTask]:
-        """查询最近任务列表。"""
+        """list_tasks：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         with self._conn() as conn:
             with conn.cursor() as cur:
                 cur.execute(
@@ -687,7 +678,7 @@ class PostgresTaskStore(TaskStore):
         return tasks
 
     def upsert_approval(self, record: ApprovalRecord) -> None:
-        """插入/更新审批记录。"""
+        """upsert_approval：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         with self._conn() as conn:
             with conn.cursor() as cur:
                 cur.execute(
@@ -711,7 +702,7 @@ class PostgresTaskStore(TaskStore):
                 )
 
     def get_approval(self, incident_id: str) -> ApprovalRecord | None:
-        """读取审批记录。"""
+        """get_approval：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         with self._conn() as conn:
             with conn.cursor() as cur:
                 cur.execute(

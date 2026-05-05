@@ -1,4 +1,4 @@
-"""???????????????ReAct ????????"""
+"""模块说明：该文件用于承载项目中的相关实现。"""
 
 from __future__ import annotations
 
@@ -22,13 +22,13 @@ from hz_bank_aiops.service.control_center import IncidentControlCenter
 
 
 class WorkflowUnavailableError(RuntimeError):
-    """当请求 langgraph 但依赖不可用时抛出。"""
+    """WorkflowUnavailableError：封装该领域职责，供上层流程统一调用。"""
 
     pass
 
 
 class _IncidentState(TypedDict, total=False):
-    """_IncidentState???????????????????"""
+    """_IncidentState：封装该领域职责，供上层流程统一调用。"""
     incident: IncidentPayload
     dedup_result: dict[str, Any]
     approval_status: ApprovalStatus
@@ -36,7 +36,7 @@ class _IncidentState(TypedDict, total=False):
 
 
 class IncidentDiagnosisWorkflow:
-    """Incident 诊断总编排器。"""
+    """IncidentDiagnosisWorkflow：封装该领域职责，供上层流程统一调用。"""
 
     def __init__(
         self,
@@ -54,7 +54,7 @@ class IncidentDiagnosisWorkflow:
         react_summary_max_entries: int = 12,
     ) -> None:
         # 复用同一套 Agent 与控制中心，保证 classic/langgraph 逻辑一致
-        """????????????????????"""
+        """初始化对象：注入依赖并保存运行所需配置。"""
         self.agent = agent
         self.control_center = control_center
         self.workflow_engine = workflow_engine
@@ -86,14 +86,14 @@ class IncidentDiagnosisWorkflow:
         self._graph = self._build_graph() if workflow_engine == "langgraph" else None
 
     def execute(self, incident: IncidentPayload) -> DiagnosisResult:
-        """执行一次诊断流程。"""
+        """execute：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         if self._graph is None:
             return self._execute_classic(incident)
         result = self._graph.invoke({"incident": incident})
         return result["result"]
 
     def _execute_classic(self, incident: IncidentPayload) -> DiagnosisResult:
-        """纯 Python 版本流程，便于依赖最小化部署。"""
+        """_execute_classic：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         if self.enable_dedup:
             dedup = self.control_center.check_duplicate(incident)
             if dedup.get("is_duplicate"):
@@ -111,7 +111,7 @@ class IncidentDiagnosisWorkflow:
         return self._react_diagnose(incident, workflow_engine="classic")
 
     def _build_graph(self):
-        """构建 LangGraph 状态图。"""
+        """_build_graph：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         try:
             from langgraph.graph import END, START, StateGraph
         except ImportError as exc:
@@ -119,7 +119,7 @@ class IncidentDiagnosisWorkflow:
 
         def dedup_node(state: _IncidentState) -> _IncidentState:
             # 去重节点：不启用时返回“非重复”占位结果
-            """dedup_node??????????????????????????"""
+            """dedup_node：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
             incident = state["incident"]
             if not self.enable_dedup:
                 return {"dedup_result": {"is_duplicate": False}}
@@ -127,17 +127,17 @@ class IncidentDiagnosisWorkflow:
 
         def route_after_dedup(state: _IncidentState) -> str:
             # 重复告警直接短路结束，非重复进入审批
-            """route_after_dedup??????????????????????????"""
+            """route_after_dedup：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
             return "duplicate" if state.get("dedup_result", {}).get("is_duplicate") else "approval"
 
         def duplicate_node(state: _IncidentState) -> _IncidentState:
-            """duplicate_node??????????????????????????"""
+            """duplicate_node：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
             incident = state["incident"]
             dedup = state.get("dedup_result", {})
             return {"result": self._duplicate_result(incident, dedup)}
 
         def approval_node(state: _IncidentState) -> _IncidentState:
-            """approval_node??????????????????????????"""
+            """approval_node：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
             incident = state["incident"]
             row = self.control_center.ensure_approval(
                 incident=incident,
@@ -147,7 +147,7 @@ class IncidentDiagnosisWorkflow:
 
         def route_after_approval(state: _IncidentState) -> str:
             # 审批放行才进入 ReAct，否则进入 pending/rejected 分支
-            """route_after_approval??????????????????????????"""
+            """route_after_approval：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
             status = state.get("approval_status", ApprovalStatus.pending)
             if status in {ApprovalStatus.approved, ApprovalStatus.auto_approved}:
                 return "react"
@@ -156,15 +156,15 @@ class IncidentDiagnosisWorkflow:
             return "pending"
 
         def pending_node(state: _IncidentState) -> _IncidentState:
-            """pending_node??????????????????????????"""
+            """pending_node：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
             return {"result": self._pending_result(state["incident"])}
 
         def rejected_node(state: _IncidentState) -> _IncidentState:
-            """rejected_node??????????????????????????"""
+            """rejected_node：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
             return {"result": self._rejected_result(state["incident"], "rejected by approver")}
 
         def react_node(state: _IncidentState) -> _IncidentState:
-            """react_node??????????????????????????"""
+            """react_node：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
             result = self._react_diagnose(state["incident"], workflow_engine="langgraph")
             return {"result": result}
 
@@ -190,7 +190,7 @@ class IncidentDiagnosisWorkflow:
         return graph.compile()
 
     def _react_diagnose(self, incident: IncidentPayload, workflow_engine: str) -> DiagnosisResult:
-        """执行 ReAct 推理，按引擎选择实现。"""
+        """_react_diagnose：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         payload = incident.model_dump(mode="json")
         if workflow_engine == "langgraph" and self._langgraph_react is not None:
             result = self._langgraph_react.run(payload)
@@ -201,7 +201,7 @@ class IncidentDiagnosisWorkflow:
         return result
 
     def _duplicate_result(self, incident: IncidentPayload, dedup: dict[str, Any]) -> DiagnosisResult:
-        """构造“重复告警被抑制”结果。"""
+        """_duplicate_result：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         return DiagnosisResult(
             incident_id=incident.incident_id,
             root_cause_top1="Duplicate incident suppressed",
@@ -217,7 +217,7 @@ class IncidentDiagnosisWorkflow:
         )
 
     def _pending_result(self, incident: IncidentPayload) -> DiagnosisResult:
-        """构造“等待审批”结果。"""
+        """_pending_result：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         return DiagnosisResult(
             incident_id=incident.incident_id,
             root_cause_top1="Waiting for human approval",
@@ -229,7 +229,7 @@ class IncidentDiagnosisWorkflow:
         )
 
     def _rejected_result(self, incident: IncidentPayload, comment: str) -> DiagnosisResult:
-        """构造“审批拒绝”结果。"""
+        """_rejected_result：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         return DiagnosisResult(
             incident_id=incident.incident_id,
             root_cause_top1="Diagnosis rejected by approver",

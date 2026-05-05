@@ -1,4 +1,4 @@
-"""???????????????????????????"""
+"""模块说明：该文件用于承载项目中的相关实现。"""
 
 from __future__ import annotations
 
@@ -13,9 +13,9 @@ from hz_bank_aiops.service import DiagnosisRuntime
 
 
 class RuntimeFlowTestCase(unittest.TestCase):
-    """RuntimeFlowTestCase???????????????????"""
+    """RuntimeFlowTestCase：封装该领域职责，供上层流程统一调用。"""
     def setUp(self) -> None:
-        """setUp??????????????????????????"""
+        """测试准备：创建测试环境、样例数据与依赖对象。"""
         self.tmp_dir = Path(".pytest_tmp") / f"runtime_flow_{uuid.uuid4().hex}"
         self.tmp_dir.mkdir(parents=True, exist_ok=True)
         sqlite_path = str((self.tmp_dir / "runtime.db").resolve())
@@ -31,11 +31,11 @@ class RuntimeFlowTestCase(unittest.TestCase):
         self.runtime.init_schema()
 
     def tearDown(self) -> None:
-        """tearDown??????????????????????????"""
+        """测试清理：回收临时资源，避免影响后续用例。"""
         shutil.rmtree(self.tmp_dir, ignore_errors=True)
 
     def test_submit_and_process_one(self) -> None:
-        """test_submit_and_process_one??????????????????????????"""
+        """test_submit_and_process_one：测试意图是验证该场景下的行为与预期结果一致。"""
         incident = IncidentPayload(
             incident_id="inc_runtime_1",
             system="payment-system",
@@ -56,7 +56,7 @@ class RuntimeFlowTestCase(unittest.TestCase):
         self.assertEqual(out["status"], "DONE")
 
     def test_approval_submit(self) -> None:
-        """test_approval_submit??????????????????????????"""
+        """test_approval_submit：测试意图是验证该场景下的行为与预期结果一致。"""
         row = self.runtime.submit_approval(
             incident_id="inc_ap_1",
             status=ApprovalStatus.approved,

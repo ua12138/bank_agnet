@@ -1,4 +1,4 @@
-"""??????????????????????????"""
+"""模块说明：该文件用于承载项目中的相关实现。"""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ import httpx
 
 
 def tool_metric_probe(incident: dict[str, Any]) -> dict[str, Any]:
-    """伪指标探针：返回固定结构的高负载信号。"""
+    """tool_metric_probe：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
     return {
         "host_count": len(incident.get("hosts", [])),
         "signals": ["mysql.connections high", "api timeout up", "5xx up"],
@@ -19,7 +19,7 @@ def tool_metric_probe(incident: dict[str, Any]) -> dict[str, Any]:
 
 
 def tool_change_probe(incident: dict[str, Any]) -> dict[str, Any]:
-    """伪变更探针：回放 recent_change_ids。"""
+    """tool_change_probe：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
     return {
         "changes": incident.get("recent_change_ids", []),
         "comment": "recent release exists before incident window",
@@ -27,7 +27,7 @@ def tool_change_probe(incident: dict[str, Any]) -> dict[str, Any]:
 
 
 def _http_error_text(resp: httpx.Response) -> str:
-    """尽量提取可读错误信息，便于调试 MCP 报错。"""
+    """_http_error_text：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
     try:
         body = resp.json()
         if isinstance(body, dict):
@@ -49,12 +49,7 @@ def tool_rag_probe(
     fast_mode: bool = True,
     use_memory: bool = False,
 ) -> dict[str, Any]:
-    """调用 RAG MCP。
-
-    策略：
-    - 先 health 检查，快速发现服务不可用/未配置问题
-    - 若 key 未配置，降级调用 lightweight 工具以保证 demo 通路可观测
-    """
+    """tool_rag_probe：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
     base = base_url.rstrip("/")
     timeout = httpx.Timeout(timeout=timeout_sec, connect=min(timeout_sec, 10.0))
     try:
@@ -111,7 +106,7 @@ def tool_rag_probe(
 
 @dataclass
 class PseudoReActEngine:
-    """PseudoReActEngine???????????????????"""
+    """PseudoReActEngine：封装该领域职责，供上层流程统一调用。"""
     rag_mcp_base_url: str
     rag_timeout_sec: float = 60.0
     rag_query_top_k: int = 1
@@ -120,7 +115,7 @@ class PseudoReActEngine:
     rag_use_memory: bool = False
 
     def run(self, incident: dict[str, Any]) -> dict[str, Any]:
-        """按固定三步执行 pseudo ReAct，并输出完整 reasoning。"""
+        """run：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         reasoning: list[dict[str, Any]] = []
 
         thought_1 = "Step1: check realtime metrics to verify actual impact."

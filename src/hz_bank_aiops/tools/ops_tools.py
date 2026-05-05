@@ -1,4 +1,4 @@
-"""???????????????????"""
+"""模块说明：该文件用于承载项目中的相关实现。"""
 
 from __future__ import annotations
 
@@ -15,14 +15,14 @@ from hz_bank_aiops.tools.base import Tool
 
 
 class ZabbixMetricsTool(Tool):
-    """查询实时指标工具。"""
+    """ZabbixMetricsTool：封装该领域职责，供上层流程统一调用。"""
 
     name = "zabbix_realtime_metrics"
     description = "Query realtime metrics from zabbix"
 
     def run(self, payload: dict[str, Any]) -> dict[str, Any]:
         # 输入统一约定：payload["incident"] 为 Incident 字典
-        """run??????????????????????????"""
+        """run：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         incident = payload.get("incident", {})
         hosts = incident.get("hosts", [])
         # 返回结构要稳定，便于 LLM 在 observation 中做模式识别
@@ -37,13 +37,13 @@ class ZabbixMetricsTool(Tool):
 
 
 class DorisHistoryTool(Tool):
-    """查询历史案例工具。"""
+    """DorisHistoryTool：封装该领域职责，供上层流程统一调用。"""
 
     name = "doris_history_lookup"
     description = "Lookup historical incidents and diagnosis results in doris"
 
     def run(self, payload: dict[str, Any]) -> dict[str, Any]:
-        """run??????????????????????????"""
+        """run：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         incident = payload.get("incident", {})
         service = incident.get("service", "")
         return {
@@ -60,13 +60,13 @@ class DorisHistoryTool(Tool):
 
 
 class XueLangChangeTool(Tool):
-    """查询变更记录工具。"""
+    """XueLangChangeTool：封装该领域职责，供上层流程统一调用。"""
 
     name = "xuelang_change_lookup"
     description = "Lookup recent deployment changes from xuelang"
 
     def run(self, payload: dict[str, Any]) -> dict[str, Any]:
-        """run??????????????????????????"""
+        """run：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         incident = payload.get("incident", {})
         changes = incident.get("recent_change_ids", [])
         return {
@@ -79,18 +79,18 @@ class XueLangChangeTool(Tool):
 
 
 class RagCaseTool(Tool):
-    """通过 MCP 查询 RAG 案例库。"""
+    """RagCaseTool：封装该领域职责，供上层流程统一调用。"""
 
     name = "rag_case_search"
     description = "Query MCP RAG service for similar cases"
 
     def __init__(self, rag_client: RagMCPClient, kb_id: str = "hz-bank-demo") -> None:
-        """????????????????????"""
+        """初始化对象：注入依赖并保存运行所需配置。"""
         self.rag_client = rag_client
         self.kb_id = kb_id
 
     def run(self, payload: dict[str, Any]) -> dict[str, Any]:
-        """run??????????????????????????"""
+        """run：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         incident = payload.get("incident", {})
         system = incident.get("system", "")
         service = incident.get("service", "")
@@ -104,7 +104,7 @@ class RagCaseTool(Tool):
 
 
 def build_default_tools(rag_client: RagMCPClient) -> list[Tool]:
-    """构造默认工具链，供 ReAct/LangGraph ReAct 共用。"""
+    """build_default_tools：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
 
     return [
         ZabbixMetricsTool(),

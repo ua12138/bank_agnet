@@ -1,4 +1,4 @@
-"""???????????????????????????"""
+"""模块说明：该文件用于承载项目中的相关实现。"""
 
 from __future__ import annotations
 
@@ -13,18 +13,18 @@ from hz_bank_aiops.service import DiagnosisRuntime
 
 
 class LangGraphReActCoTTestCase(unittest.TestCase):
-    """LangGraphReActCoTTestCase???????????????????"""
+    """LangGraphReActCoTTestCase：封装该领域职责，供上层流程统一调用。"""
     def setUp(self) -> None:
-        """setUp??????????????????????????"""
+        """测试准备：创建测试环境、样例数据与依赖对象。"""
         self.tmp_dir = Path(".pytest_tmp") / f"langgraph_cot_{uuid.uuid4().hex}"
         self.tmp_dir.mkdir(parents=True, exist_ok=True)
 
     def tearDown(self) -> None:
-        """tearDown??????????????????????????"""
+        """测试清理：回收临时资源，避免影响后续用例。"""
         shutil.rmtree(self.tmp_dir, ignore_errors=True)
 
     def _build_runtime(self, cot_enabled: bool) -> DiagnosisRuntime:
-        """_build_runtime??????????????????????????"""
+        """_build_runtime：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         settings = Settings(
             task_db_kind="sqlite",
             sqlite_path=str((self.tmp_dir / f"runtime_{uuid.uuid4().hex}.db").resolve()),
@@ -42,7 +42,7 @@ class LangGraphReActCoTTestCase(unittest.TestCase):
         return runtime
 
     def _incident(self, incident_id: str) -> IncidentPayload:
-        """_incident??????????????????????????"""
+        """_incident：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         return IncidentPayload(
             incident_id=incident_id,
             system="payment-system",
@@ -57,7 +57,7 @@ class LangGraphReActCoTTestCase(unittest.TestCase):
         )
 
     def test_langgraph_writes_cot_trace_when_enabled(self) -> None:
-        """test_langgraph_writes_cot_trace_when_enabled??????????????????????????"""
+        """test_langgraph_writes_cot_trace_when_enabled：测试意图是验证该场景下的行为与预期结果一致。"""
         runtime = self._build_runtime(cot_enabled=True)
         if runtime.resolved_workflow_engine != "langgraph":
             self.skipTest("langgraph is not installed in current test environment")
@@ -74,7 +74,7 @@ class LangGraphReActCoTTestCase(unittest.TestCase):
             self.assertLessEqual(len(line), 80)
 
     def test_langgraph_does_not_write_cot_trace_when_disabled(self) -> None:
-        """test_langgraph_does_not_write_cot_trace_when_disabled??????????????????????????"""
+        """test_langgraph_does_not_write_cot_trace_when_disabled：测试意图是验证该场景下的行为与预期结果一致。"""
         runtime = self._build_runtime(cot_enabled=False)
         if runtime.resolved_workflow_engine != "langgraph":
             self.skipTest("langgraph is not installed in current test environment")

@@ -1,4 +1,4 @@
-"""????????????????Agent????????"""
+"""模块说明：该文件用于承载项目中的相关实现。"""
 
 from __future__ import annotations
 
@@ -28,10 +28,10 @@ from hz_bank_aiops.tools import build_default_tools
 
 
 class DiagnosisRuntime:
-    """诊断系统运行时入口。"""
+    """DiagnosisRuntime：封装该领域职责，供上层流程统一调用。"""
 
     def __init__(self, settings: Settings) -> None:
-        """????????????????????"""
+        """初始化对象：注入依赖并保存运行所需配置。"""
         self.settings = settings
         # 1) 存储层
         self.store: TaskStore = build_task_store(settings)
@@ -42,7 +42,15 @@ class DiagnosisRuntime:
         )
         # 3) Tool 与 Agent
         self.tools = build_default_tools(rag_client=self.rag_client)
-        self.agent = ReActAgent(tools=self.tools, max_steps=6)
+        self.agent = ReActAgent(
+            tools=self.tools,
+            max_steps=6,
+            llm_provider=settings.llm_provider,
+            llm_api_key=settings.llm_api_key,
+            llm_base_url=settings.llm_base_url,
+            llm_model=settings.llm_model,
+            llm_request_timeout_sec=settings.llm_request_timeout_sec,
+        )
         # 4) 治理中台（去重/审批）
         self.control_center = IncidentControlCenter(
             store=self.store,
@@ -92,11 +100,11 @@ class DiagnosisRuntime:
         )
 
     def init_schema(self) -> None:
-        """初始化数据库表结构。"""
+        """init_schema：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         self.store.init_schema()
 
     def health(self) -> dict[str, Any]:
-        """聚合系统健康状态，供 API `/health` 直接返回。"""
+        """health：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         rag_health = self.rag_client.health()
         return {
             "app": self.settings.app_name,
@@ -111,25 +119,28 @@ class DiagnosisRuntime:
             "react_context_window_steps": self.settings.react_context_window_steps,
             "react_summary_max_chars": self.settings.react_summary_max_chars,
             "react_summary_max_entries": self.settings.react_summary_max_entries,
+            "llm_provider": self.settings.llm_provider,
+            "llm_model": self.settings.llm_model,
+            "planner_mode": self.agent.planner_mode,
             "rag_mcp_ok": rag_health.ok,
             "rag_mcp_data": rag_health.data,
             "rag_mcp_error": rag_health.error,
         }
 
     def submit_incident(self, incident: IncidentPayload, priority: str = "P2") -> int:
-        """提交 incident 到任务队列。"""
+        """submit_incident：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         return self.store.enqueue_incident(incident.model_dump(mode="json"), priority=priority)
 
     def get_task(self, task_id: int):
-        """查询任务。"""
+        """get_task：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         return self.store.get_task(task_id)
 
     def list_tasks(self, limit: int = 50):
-        """查询最近任务列表。"""
+        """list_tasks：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         return self.store.list_tasks(limit=limit)
 
     def get_approval(self, incident_id: str) -> ApprovalRecord | None:
-        """读取审批状态。"""
+        """get_approval：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         return self.store.get_approval(incident_id)
 
     def submit_approval(
@@ -139,7 +150,7 @@ class DiagnosisRuntime:
         approver: str,
         comment: str = "",
     ) -> ApprovalRecord:
-        """提交人工审批结论。"""
+        """submit_approval：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         return self.control_center.submit_approval(
             incident_id=incident_id,
             status=status,
@@ -148,15 +159,7 @@ class DiagnosisRuntime:
         )
 
     def process_one_task(self, worker_id: str) -> dict[str, Any]:
-        """消费并处理一条任务。
-
-        主流程：
-        1. 抢占任务
-        2. 执行编排诊断
-        3. 落库结果
-        4. 发送通知（可选）
-        5. 更新任务状态
-        """
+        """process_one_task：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         claim = self.store.claim_next_task(worker_id)
         if not claim.claimed or not claim.task:
             return {"claimed": False, "message": "no pending task"}
@@ -195,7 +198,7 @@ class DiagnosisRuntime:
             }
 
     def _notify_if_needed(self, need_notify: bool, result: DiagnosisResult) -> NotifyStatus:
-        """按任务配置决定是否发送通知。"""
+        """_notify_if_needed：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         if not need_notify:
             return NotifyStatus.skipped
         if not self.notifier.enabled():

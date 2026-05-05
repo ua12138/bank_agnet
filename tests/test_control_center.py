@@ -1,4 +1,4 @@
-"""???????????????????????????"""
+"""模块说明：该文件用于承载项目中的相关实现。"""
 
 from __future__ import annotations
 
@@ -13,9 +13,9 @@ from hz_bank_aiops.storage.task_store import SQLiteTaskStore
 
 
 class ControlCenterTestCase(unittest.TestCase):
-    """ControlCenterTestCase???????????????????"""
+    """ControlCenterTestCase：封装该领域职责，供上层流程统一调用。"""
     def setUp(self) -> None:
-        """setUp??????????????????????????"""
+        """测试准备：创建测试环境、样例数据与依赖对象。"""
         self.tmp_dir = Path(".pytest_tmp") / f"control_center_{uuid.uuid4().hex}"
         self.tmp_dir.mkdir(parents=True, exist_ok=True)
         store = SQLiteTaskStore(self.tmp_dir / "cc.db")
@@ -23,11 +23,11 @@ class ControlCenterTestCase(unittest.TestCase):
         self.cc = IncidentControlCenter(store=store, dedup_window_sec=300)
 
     def tearDown(self) -> None:
-        """tearDown??????????????????????????"""
+        """测试清理：回收临时资源，避免影响后续用例。"""
         shutil.rmtree(self.tmp_dir, ignore_errors=True)
 
     def _incident(self, incident_id: str) -> IncidentPayload:
-        """_incident??????????????????????????"""
+        """_incident：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         return IncidentPayload(
             incident_id=incident_id,
             system="payment-system",
@@ -42,7 +42,7 @@ class ControlCenterTestCase(unittest.TestCase):
         )
 
     def test_dedup(self) -> None:
-        """test_dedup??????????????????????????"""
+        """test_dedup：测试意图是验证该场景下的行为与预期结果一致。"""
         first = self.cc.check_duplicate(self._incident("inc_a"))
         second = self.cc.check_duplicate(self._incident("inc_b"))
         self.assertFalse(first["is_duplicate"])

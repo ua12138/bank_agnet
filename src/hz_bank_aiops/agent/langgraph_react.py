@@ -1,4 +1,4 @@
-"""???????????????????"""
+"""模块说明：该文件用于承载项目中的相关实现。"""
 
 from __future__ import annotations
 
@@ -17,11 +17,11 @@ from hz_bank_aiops.models import DiagnosisResult, ToolTraceStep
 
 
 class LangGraphReactUnavailableError(RuntimeError):
-    """langgraph 依赖缺失时抛出。"""
+    """LangGraphReactUnavailableError：封装该领域职责，供上层流程统一调用。"""
 
 
 class _ReActState(TypedDict, total=False):
-    """_ReActState???????????????????"""
+    """_ReActState：封装该领域职责，供上层流程统一调用。"""
     incident: dict[str, Any]
     # 滑动窗口步骤，仅供 planner 使用
     steps: list[ToolTraceStep]
@@ -39,7 +39,7 @@ class _ReActState(TypedDict, total=False):
 
 
 class LangGraphReActExecutor:
-    """LangGraph ReAct 执行器。"""
+    """LangGraphReActExecutor：封装该领域职责，供上层流程统一调用。"""
 
     def __init__(
         self,
@@ -53,7 +53,7 @@ class LangGraphReActExecutor:
         summary_max_chars: int = 480,
         summary_max_entries: int = 12,
     ) -> None:
-        """????????????????????"""
+        """初始化对象：注入依赖并保存运行所需配置。"""
         self.agent = agent
         self.max_steps = max_steps
 
@@ -69,7 +69,7 @@ class LangGraphReActExecutor:
         self.graph = self._build_graph()
 
     def _build_graph(self):
-        """_build_graph??????????????????????????"""
+        """_build_graph：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         try:
             from langgraph.graph import END, START, StateGraph
         except ImportError as exc:
@@ -78,7 +78,7 @@ class LangGraphReActExecutor:
             ) from exc
 
         def plan(state: _ReActState) -> _ReActState:
-            """plan??????????????????????????"""
+            """plan：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
             window_steps = list(state.get("steps", []))
             all_steps = list(state.get("all_steps", []))
             cot_trace = list(state.get("cot_trace", []))
@@ -136,7 +136,7 @@ class LangGraphReActExecutor:
             }
 
         def act(state: _ReActState) -> _ReActState:
-            """act??????????????????????????"""
+            """act：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
             window_steps = list(state.get("steps", []))
             all_steps = list(state.get("all_steps", []))
             cot_trace = list(state.get("cot_trace", []))
@@ -201,11 +201,11 @@ class LangGraphReActExecutor:
             }
 
         def route_after_plan(state: _ReActState) -> str:
-            """route_after_plan??????????????????????????"""
+            """route_after_plan：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
             return "end" if state.get("done", False) else "act"
 
         def route_after_act(state: _ReActState) -> str:
-            """route_after_act??????????????????????????"""
+            """route_after_act：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
             return "plan" if not state.get("done", False) else "end"
 
         graph = StateGraph(_ReActState)
@@ -217,7 +217,7 @@ class LangGraphReActExecutor:
         return graph.compile()
 
     def run(self, incident: dict[str, Any]) -> DiagnosisResult:
-        """run??????????????????????????"""
+        """run：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         result = self.graph.invoke(
             {
                 "incident": incident,
@@ -250,7 +250,7 @@ class LangGraphReActExecutor:
         return diagnosis
 
     def _merge_summary(self, existing: str, overflow_steps: list[ToolTraceStep]) -> str:
-        """_merge_summary??????????????????????????"""
+        """_merge_summary：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         lines = [line for line in existing.split("\n") if line.strip()] if existing else []
         for step in overflow_steps:
             status = "ok" if step.observation.get("ok") else "error"
@@ -267,31 +267,31 @@ class LangGraphReActExecutor:
         return self._clip_with_limit(merged, self.summary_max_chars)
 
     def _append_cot(self, cot_trace: list[str], line: str) -> list[str]:
-        """_append_cot??????????????????????????"""
+        """_append_cot：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         cot_trace.append(self._clip(line))
         if len(cot_trace) > self.cot_max_entries:
             return cot_trace[-self.cot_max_entries :]
         return cot_trace
 
     def _clip(self, text: str) -> str:
-        """_clip??????????????????????????"""
+        """_clip：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         if len(text) <= self.cot_max_chars:
             return text
         return text[: self.cot_max_chars - 3] + "..."
 
     def _clip_with_limit(self, text: str, max_chars: int) -> str:
-        """_clip_with_limit??????????????????????????"""
+        """_clip_with_limit：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         if len(text) <= max_chars:
             return text
         return text[: max_chars - 3] + "..."
 
     def _clip_summary_line(self, text: str) -> str:
-        """_clip_summary_line??????????????????????????"""
+        """_clip_summary_line：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         line_limit = max(120, self.summary_max_chars // 2)
         return self._clip_with_limit(text, line_limit)
 
     def _compact_observation(self, observation: dict[str, Any]) -> str:
-        """_compact_observation??????????????????????????"""
+        """_compact_observation：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         if not observation:
             return "empty observation"
         if observation.get("ok") is False and observation.get("error"):

@@ -1,2 +1,2 @@
-"""Minimal demotest package for end-to-end validation."""
+"""模块说明：该文件用于承载项目中的相关实现。"""
 

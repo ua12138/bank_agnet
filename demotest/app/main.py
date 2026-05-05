@@ -1,4 +1,4 @@
-"""??????????????????????????"""
+"""模块说明：该文件用于承载项目中的相关实现。"""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ app = FastAPI(title="HZ AIOps DemoTest", version="1.0.0")
 
 @lru_cache(maxsize=1)
 def get_db() -> DemoSQLite:
-    """初始化并缓存 demo sqlite。"""
+    """get_db：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
     settings = get_demo_settings()
     db = DemoSQLite(settings.sqlite_path_obj)
     db.init()
@@ -32,7 +32,7 @@ def get_db() -> DemoSQLite:
 
 @lru_cache(maxsize=1)
 def get_worker() -> DemoWorker:
-    """初始化并缓存 demo worker。"""
+    """get_worker：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
     settings = get_demo_settings()
     db = get_db()
     engine = PseudoReActEngine(
@@ -47,7 +47,7 @@ def get_worker() -> DemoWorker:
 
 
 def _sample_incident() -> dict[str, Any]:
-    """构造一条固定伪数据，便于快速复现实验。"""
+    """_sample_incident：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
     return {
         "incident_id": "demo_inc_001",
         "system": "payment-system",
@@ -66,7 +66,7 @@ def _sample_incident() -> dict[str, Any]:
 
 @app.get("/health")
 def health() -> dict[str, Any]:
-    """返回 demotest 关键运行参数。"""
+    """health：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
     settings = get_demo_settings()
     return {
         "ok": True,
@@ -82,31 +82,31 @@ def health() -> dict[str, Any]:
 
 @app.post("/demo/seed")
 def seed() -> dict[str, Any]:
-    """插入一条伪 incident 任务。"""
+    """seed：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
     task_id = get_db().insert_task(_sample_incident())
     return {"ok": True, "task_id": task_id}
 
 
 @app.post("/demo/run-once")
 def run_once() -> dict[str, Any]:
-    """触发 worker 消费一次。"""
+    """run_once：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
     return get_worker().run_once()
 
 
 @app.get("/demo/tasks")
 def list_tasks() -> list[dict[str, Any]]:
-    """查看 demo 任务表。"""
+    """list_tasks：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
     return get_db().list_tasks()
 
 
 @app.get("/demo/results")
 def list_results() -> list[dict[str, Any]]:
-    """查看 demo 结果表。"""
+    """list_results：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
     return get_db().list_results()
 
 
 def run() -> None:
-    """本地启动入口。"""
+    """run：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
     import uvicorn
 
     uvicorn.run("demotest.app.main:app", host="0.0.0.0", port=8098, reload=False)

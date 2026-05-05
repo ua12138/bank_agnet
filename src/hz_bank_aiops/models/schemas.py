@@ -1,4 +1,4 @@
-"""???????????????????"""
+"""模块说明：该文件用于承载项目中的相关实现。"""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ from pydantic import BaseModel, Field
 
 
 class Severity(str, Enum):
-    """事件严重级别。"""
+    """Severity：封装该领域职责，供上层流程统一调用。"""
 
     low = "low"
     medium = "medium"
@@ -28,7 +28,7 @@ class Severity(str, Enum):
 
 
 class TaskStatus(str, Enum):
-    """诊断任务状态机。"""
+    """TaskStatus：封装该领域职责，供上层流程统一调用。"""
 
     new = "NEW"
     processing = "PROCESSING"
@@ -39,7 +39,7 @@ class TaskStatus(str, Enum):
 
 
 class NotifyStatus(str, Enum):
-    """通知发送状态。"""
+    """NotifyStatus：封装该领域职责，供上层流程统一调用。"""
 
     pending = "PENDING"
     sent = "SENT"
@@ -48,7 +48,7 @@ class NotifyStatus(str, Enum):
 
 
 class ApprovalStatus(str, Enum):
-    """人工审批状态。"""
+    """ApprovalStatus：封装该领域职责，供上层流程统一调用。"""
 
     pending = "pending"
     approved = "approved"
@@ -57,7 +57,7 @@ class ApprovalStatus(str, Enum):
 
 
 class AlertEvent(BaseModel):
-    """原始告警事件（偏实时流）。"""
+    """AlertEvent：封装该领域职责，供上层流程统一调用。"""
 
     event_id: str
     source: str = "zabbix"
@@ -72,14 +72,14 @@ class AlertEvent(BaseModel):
 
 
 class IncidentMetric(BaseModel):
-    """聚合后 Incident 中的指标快照。"""
+    """IncidentMetric：封装该领域职责，供上层流程统一调用。"""
 
     metric: str
     value: float
 
 
 class IncidentPayload(BaseModel):
-    """进入诊断系统的 Incident 载荷。"""
+    """IncidentPayload：封装该领域职责，供上层流程统一调用。"""
 
     incident_id: str
     system: str
@@ -95,7 +95,7 @@ class IncidentPayload(BaseModel):
 
 
 class DiagnosisTask(BaseModel):
-    """任务队列表中的诊断任务。"""
+    """DiagnosisTask：封装该领域职责，供上层流程统一调用。"""
 
     id: int | None = None
     incident_id: str
@@ -117,14 +117,14 @@ class DiagnosisTask(BaseModel):
 
 
 class RootCauseCandidate(BaseModel):
-    """候选根因。"""
+    """RootCauseCandidate：封装该领域职责，供上层流程统一调用。"""
 
     cause: str
     confidence: float = Field(..., ge=0.0, le=1.0)
 
 
 class ToolTraceStep(BaseModel):
-    """单步 Tool 调用轨迹（thought/action/observation）。"""
+    """ToolTraceStep：封装该领域职责，供上层流程统一调用。"""
 
     index: int
     thought: str
@@ -134,7 +134,7 @@ class ToolTraceStep(BaseModel):
 
 
 class DiagnosisResult(BaseModel):
-    """Agent 输出的标准化诊断结果。"""
+    """DiagnosisResult：封装该领域职责，供上层流程统一调用。"""
 
     incident_id: str
     root_cause_top1: str
@@ -149,7 +149,7 @@ class DiagnosisResult(BaseModel):
 
 
 class ApprovalRecord(BaseModel):
-    """审批记录表对象。"""
+    """ApprovalRecord：封装该领域职责，供上层流程统一调用。"""
 
     incident_id: str
     status: ApprovalStatus
@@ -160,7 +160,7 @@ class ApprovalRecord(BaseModel):
 
 
 class ApprovalDecisionRequest(BaseModel):
-    """审批 API 入参。"""
+    """ApprovalDecisionRequest：封装该领域职责，供上层流程统一调用。"""
 
     status: ApprovalStatus
     approver: str
@@ -168,7 +168,7 @@ class ApprovalDecisionRequest(BaseModel):
 
 
 class FeishuMessage(BaseModel):
-    """飞书消息体（内部中间对象）。"""
+    """FeishuMessage：封装该领域职责，供上层流程统一调用。"""
 
     incident_id: str
     title: str
@@ -176,7 +176,7 @@ class FeishuMessage(BaseModel):
 
 
 class TaskClaimResult(BaseModel):
-    """Worker 抢占任务的结果。"""
+    """TaskClaimResult：封装该领域职责，供上层流程统一调用。"""
 
     claimed: bool
     task: DiagnosisTask | None = None

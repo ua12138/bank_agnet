@@ -1,7 +1,4 @@
-"""项目运行配置。
-
-该模块集中管理环境变量与默认值，避免在业务代码中散落硬编码。
-"""
+"""模块说明：该文件用于承载项目中的相关实现。"""
 
 from functools import lru_cache
 from pathlib import Path
@@ -12,12 +9,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    """全局配置对象。
-
-    说明：
-    - 字段会按 `HZ_AIOPS_` 前缀从 `.env` / 系统环境变量加载。
-    - 该对象通过 `get_settings()` 缓存为单例，避免重复解析。
-    """
+    """Settings：封装该领域职责，供上层流程统一调用。"""
 
     # 应用基础信息
     app_name: str = "hz-bank-aiops-incident"
@@ -35,6 +27,12 @@ class Settings(BaseSettings):
     react_context_window_steps: int = 3
     react_summary_max_chars: int = 480
     react_summary_max_entries: int = 12
+    # LLM 提供方配置：默认优先使用硅基流动，未配置 key 时自动降级到本地 mock planner
+    llm_provider: Literal["siliconflow"] = "siliconflow"
+    llm_api_key: str = ""
+    llm_base_url: str = "https://api.siliconflow.cn/v1"
+    llm_model: str = "Qwen/Qwen2.5-14B-Instruct"
+    llm_request_timeout_sec: float = 20.0
 
     # 去重与人工审批开关
     enable_dedup: bool = True
@@ -67,12 +65,12 @@ class Settings(BaseSettings):
 
     @property
     def sqlite_path_obj(self) -> Path:
-        """返回 sqlite 文件的绝对路径。"""
+        """sqlite_path_obj：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         return Path(self.sqlite_path).resolve()
 
     @property
     def runtime_ready(self) -> bool:
-        """检查当前配置是否具备最小可运行条件。"""
+        """runtime_ready：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         if self.task_db_kind == "postgres":
             return bool(self.postgres_dsn)
         return True
@@ -83,5 +81,5 @@ class Settings(BaseSettings):
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
-    """返回缓存后的配置单例。"""
+    """get_settings：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
     return Settings()

@@ -1,4 +1,4 @@
-"""???????????????????????????"""
+"""模块说明：该文件用于承载项目中的相关实现。"""
 
 from __future__ import annotations
 
@@ -12,9 +12,9 @@ from hz_bank_aiops.storage.task_store import SQLiteTaskStore, TaskStatus
 
 
 class SQLiteTaskStoreTestCase(unittest.TestCase):
-    """SQLiteTaskStoreTestCase???????????????????"""
+    """SQLiteTaskStoreTestCase：封装该领域职责，供上层流程统一调用。"""
     def setUp(self) -> None:
-        """setUp??????????????????????????"""
+        """测试准备：创建测试环境、样例数据与依赖对象。"""
         self.tmp_dir = Path(".pytest_tmp") / f"task_store_{uuid.uuid4().hex}"
         self.tmp_dir.mkdir(parents=True, exist_ok=True)
         db_path = self.tmp_dir / "task.db"
@@ -22,11 +22,11 @@ class SQLiteTaskStoreTestCase(unittest.TestCase):
         self.store.init_schema()
 
     def tearDown(self) -> None:
-        """tearDown??????????????????????????"""
+        """测试清理：回收临时资源，避免影响后续用例。"""
         shutil.rmtree(self.tmp_dir, ignore_errors=True)
 
     def test_enqueue_and_claim(self) -> None:
-        """test_enqueue_and_claim??????????????????????????"""
+        """test_enqueue_and_claim：测试意图是验证该场景下的行为与预期结果一致。"""
         payload = {
             "incident_id": "inc_test_1",
             "system": "payment-system",
@@ -50,7 +50,7 @@ class SQLiteTaskStoreTestCase(unittest.TestCase):
         self.assertEqual(claim.task.status, TaskStatus.processing)
 
     def test_mark_done_and_save_result(self) -> None:
-        """test_mark_done_and_save_result??????????????????????????"""
+        """test_mark_done_and_save_result：测试意图是验证该场景下的行为与预期结果一致。"""
         payload = {
             "incident_id": "inc_test_2",
             "system": "payment-system",

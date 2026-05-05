@@ -1,4 +1,4 @@
-"""存储层导出入口。"""
+"""模块说明：该文件用于承载项目中的相关实现。"""
 
 from .factory import build_task_store
 from .task_store import PostgresTaskStore, SQLiteTaskStore, TaskStore

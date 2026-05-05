@@ -1,4 +1,4 @@
-"""???????????????????"""
+"""模块说明：该文件用于承载项目中的相关实现。"""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from hz_bank_aiops.models import DiagnosisResult, FeishuMessage
 
 @dataclass
 class FeishuNotifyResult:
-    """飞书发送结果。"""
+    """FeishuNotifyResult：封装该领域职责，供上层流程统一调用。"""
 
     ok: bool
     message: str = ""
@@ -22,19 +22,19 @@ class FeishuNotifyResult:
 
 
 class FeishuNotifier:
-    """诊断结果通知发送器。"""
+    """FeishuNotifier：封装该领域职责，供上层流程统一调用。"""
 
     def __init__(self, webhook_url: str, timeout_sec: float = 5.0) -> None:
-        """????????????????????"""
+        """初始化对象：注入依赖并保存运行所需配置。"""
         self.webhook_url = webhook_url
         self.timeout_sec = timeout_sec
 
     def enabled(self) -> bool:
-        """仅当配置 webhook 地址时才可发送。"""
+        """enabled：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         return bool(self.webhook_url)
 
     def build_message(self, result: DiagnosisResult) -> FeishuMessage:
-        """将结构化诊断结果组装为飞书文本。"""
+        """build_message：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
 
         # 只截取前 3 条证据/建议，避免消息过长影响移动端阅读体验
         evidence = "\n".join(f"- {x}" for x in result.evidence[:3]) or "- None"
@@ -53,7 +53,7 @@ class FeishuNotifier:
         )
 
     def send(self, result: DiagnosisResult) -> FeishuNotifyResult:
-        """发送飞书通知；失败时返回错误，不抛出到业务主流程。"""
+        """send：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         if not self.enabled():
             return FeishuNotifyResult(ok=False, message="webhook not configured")
 
@@ -87,6 +87,6 @@ class FeishuNotifier:
             return FeishuNotifyResult(ok=False, message=str(exc), response_body={"error": str(exc)})
 
     def dump_preview(self, result: DiagnosisResult) -> str:
-        """输出消息预览，便于本地调试。"""
+        """dump_preview：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         message = self.build_message(result)
         return json.dumps(message.model_dump(mode="json"), ensure_ascii=False, indent=2)

@@ -1,12 +1,14 @@
-"""???????????????????"""
+"""模块说明：该文件用于承载项目中的相关实现。"""
 
 from __future__ import annotations
 
 """经典 ReAct Agent 实现（无外部 LLM 依赖的可运行版本）。"""
 
 from dataclasses import dataclass
+import json
 from typing import Any
 
+import httpx
 from pydantic import BaseModel, Field
 
 from hz_bank_aiops.models import DiagnosisResult, RootCauseCandidate, ToolTraceStep
@@ -14,18 +16,14 @@ from hz_bank_aiops.tools import Tool
 
 
 class FunctionCall(BaseModel):
-    """模拟 function calling 的调用对象。"""
+    """FunctionCall：封装该领域职责，供上层流程统一调用。"""
 
     name: str
     arguments: dict[str, Any] = Field(default_factory=dict)
 
 
 class LLMAction(BaseModel):
-    """规划器输出动作。
-
-    - kind=tool: 继续调用工具
-    - kind=final: 输出最终结论
-    """
+    """LLMAction：封装该领域职责，供上层流程统一调用。"""
 
     kind: str  # "tool" | "final"
     thought: str
@@ -35,7 +33,7 @@ class LLMAction(BaseModel):
 
 @dataclass
 class PlannerContext:
-    """规划器可见上下文。"""
+    """PlannerContext：封装该领域职责，供上层流程统一调用。"""
 
     incident: dict[str, Any]
     steps: list[ToolTraceStep]
@@ -44,9 +42,7 @@ class PlannerContext:
 
 
 class MockOpsPlanner:
-    """
-    Deterministic planner that simulates a ReAct-capable LLM.
-    """
+    """MockOpsPlanner：封装该领域职责，供上层流程统一调用。"""
 
     sequence = [
         "zabbix_realtime_metrics",
@@ -56,7 +52,7 @@ class MockOpsPlanner:
     ]
 
     def next_action(self, ctx: PlannerContext) -> LLMAction:
-        """按固定顺序执行工具，模拟 LLM 的 ReAct 决策。"""
+        """next_action：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         done = ctx.completed_actions or {step.action for step in ctx.steps}
         for tool_name in self.sequence:
             if tool_name not in done:
@@ -75,7 +71,7 @@ class MockOpsPlanner:
         )
 
     def _build_final(self, incident: dict[str, Any], steps: list[ToolTraceStep]) -> dict[str, Any]:
-        """根据已收集 observation 组装最终结果。"""
+        """_build_final：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         evidence: list[str] = []
         for step in steps:
             observation = step.observation
@@ -113,17 +109,143 @@ class MockOpsPlanner:
         }
 
 
-class ReActAgent:
-    """经典 ReAct 循环执行器。"""
+class SiliconFlowPlanner:
+    """SiliconFlowPlanner：封装该领域职责，供上层流程统一调用。"""
 
-    def __init__(self, tools: list[Tool], max_steps: int = 6) -> None:
-        """????????????????????"""
+    def __init__(
+        self,
+        api_key: str,
+        base_url: str,
+        model: str,
+        timeout_sec: float,
+        fallback_planner: MockOpsPlanner | None = None,
+    ) -> None:
+        self.api_key = api_key
+        self.base_url = base_url.rstrip("/")
+        self.model = model
+        self.timeout_sec = timeout_sec
+        self.fallback_planner = fallback_planner or MockOpsPlanner()
+
+    def next_action(self, ctx: PlannerContext) -> LLMAction:
+        """next_action：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
+        if not self.api_key:
+            return self.fallback_planner.next_action(ctx)
+
+        try:
+            return self._next_action_by_llm(ctx)
+        except Exception:  # noqa: BLE001
+            return self.fallback_planner.next_action(ctx)
+
+    def _next_action_by_llm(self, ctx: PlannerContext) -> LLMAction:
+        steps_summary = [
+            {
+                "index": step.index,
+                "action": step.action,
+                "ok": bool(step.observation.get("ok")),
+                "error": str(step.observation.get("error", ""))[:200],
+            }
+            for step in ctx.steps
+        ]
+        completed_actions = sorted(ctx.completed_actions or set())
+
+        schema_tip = {
+            "kind": "tool|final",
+            "thought": "string",
+            "function_call": {"name": "tool_name", "arguments": {"incident": "<incident object>"}},
+            "final_payload": {
+                "incident_id": "string",
+                "root_cause_top1": "string",
+                "root_cause_candidates": [{"cause": "string", "confidence": 0.0}],
+                "evidence": ["string"],
+                "suggestions": ["string"],
+                "confidence": 0.0,
+            },
+        }
+        prompt = (
+            "You are an AIOps ReAct planner. Decide next action.\n"
+            "Output JSON only, no markdown.\n"
+            f"Output schema example: {json.dumps(schema_tip, ensure_ascii=False)}\n"
+            f"Incident: {json.dumps(ctx.incident, ensure_ascii=False)}\n"
+            f"Recent steps: {json.dumps(steps_summary, ensure_ascii=False)}\n"
+            f"Completed actions: {json.dumps(completed_actions, ensure_ascii=False)}\n"
+            f"Memory summary: {ctx.memory_summary}\n"
+            "If more evidence is needed, return kind=tool and choose one of: "
+            "zabbix_realtime_metrics, doris_history_lookup, xuelang_change_lookup, rag_case_search. "
+            "If enough evidence, return kind=final with concise payload."
+        )
+
+        with httpx.Client(timeout=self.timeout_sec) as client:
+            resp = client.post(
+                f"{self.base_url}/chat/completions",
+                headers={"Authorization": f"Bearer {self.api_key}"},
+                json={
+                    "model": self.model,
+                    "messages": [
+                        {"role": "system", "content": "You are a strict JSON generator."},
+                        {"role": "user", "content": prompt},
+                    ],
+                    "temperature": 0.1,
+                },
+            )
+            resp.raise_for_status()
+            data = resp.json()
+            content = data["choices"][0]["message"]["content"]
+
+        parsed = json.loads(content)
+        kind = str(parsed.get("kind", "")).strip().lower()
+        thought = str(parsed.get("thought", ""))
+        if kind == "tool":
+            fc = parsed.get("function_call") or {}
+            tool_name = str(fc.get("name", ""))
+            arguments = fc.get("arguments") or {"incident": ctx.incident}
+            if tool_name not in MockOpsPlanner.sequence:
+                return self.fallback_planner.next_action(ctx)
+            return LLMAction(
+                kind="tool",
+                thought=thought or f"Need more evidence from {tool_name}.",
+                function_call=FunctionCall(name=tool_name, arguments=arguments),
+            )
+
+        if kind == "final":
+            payload = parsed.get("final_payload") or {}
+            payload.setdefault("incident_id", ctx.incident.get("incident_id", ""))
+            return LLMAction(kind="final", thought=thought or "Generate final diagnosis.", final_payload=payload)
+
+        return self.fallback_planner.next_action(ctx)
+
+
+class ReActAgent:
+    """ReActAgent：封装该领域职责，供上层流程统一调用。"""
+
+    def __init__(
+        self,
+        tools: list[Tool],
+        max_steps: int = 6,
+        llm_provider: str = "siliconflow",
+        llm_api_key: str = "",
+        llm_base_url: str = "https://api.siliconflow.cn/v1",
+        llm_model: str = "Qwen/Qwen2.5-14B-Instruct",
+        llm_request_timeout_sec: float = 20.0,
+    ) -> None:
+        """初始化对象：注入依赖并保存运行所需配置。"""
         self.tools = {tool.name: tool for tool in tools}
         self.max_steps = max_steps
-        self.planner = MockOpsPlanner()
+        self.fallback_planner = MockOpsPlanner()
+        if llm_provider == "siliconflow" and llm_api_key:
+            self.planner = SiliconFlowPlanner(
+                api_key=llm_api_key,
+                base_url=llm_base_url,
+                model=llm_model,
+                timeout_sec=llm_request_timeout_sec,
+                fallback_planner=self.fallback_planner,
+            )
+            self.planner_mode = "siliconflow"
+        else:
+            self.planner = self.fallback_planner
+            self.planner_mode = "mock"
 
     def run(self, incident: dict[str, Any]) -> DiagnosisResult:
-        """执行 ReAct 循环。"""
+        """run：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         steps: list[ToolTraceStep] = []
 
         for idx in range(self.max_steps):
@@ -179,7 +301,7 @@ class ReActAgent:
         )
 
     def _to_result(self, payload: dict[str, Any], steps: list[ToolTraceStep]) -> DiagnosisResult:
-        """将 planner 输出字典标准化为 DiagnosisResult。"""
+        """_to_result：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         candidates = [
             RootCauseCandidate(cause=item["cause"], confidence=float(item["confidence"]))
             for item in payload.get("root_cause_candidates", [])

@@ -1,4 +1,4 @@
-"""???????????????????"""
+"""模块说明：该文件用于承载项目中的相关实现。"""
 
 from __future__ import annotations
 
@@ -12,12 +12,12 @@ from typing import Any
 
 
 class Tool(ABC):
-    """所有诊断工具的统一协议。"""
+    """Tool：封装该领域职责，供上层流程统一调用。"""
 
     name: str
     description: str
 
     @abstractmethod
     def run(self, payload: dict[str, Any]) -> dict[str, Any]:
-        """执行工具并返回结构化 observation。"""
+        """run：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
         raise NotImplementedError

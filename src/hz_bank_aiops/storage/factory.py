@@ -1,4 +1,4 @@
-"""存储工厂：根据配置选择 SQLite 或 PostgreSQL 实现。"""
+"""模块说明：该文件用于承载项目中的相关实现。"""
 
 from pathlib import Path
 
@@ -7,12 +7,7 @@ from hz_bank_aiops.storage.task_store import PostgresTaskStore, SQLiteTaskStore,
 
 
 def build_task_store(settings: Settings) -> TaskStore:
-    """按配置实例化任务存储。
-
-    设计目标：
-    - 本地开发零依赖（sqlite）
-    - 生产可切换为 postgres 并发消费
-    """
+    """build_task_store：执行该步骤的核心逻辑，输入输出见参数与返回值定义。"""
     if settings.task_db_kind == "postgres":
         if not settings.postgres_dsn:
             raise RuntimeError("HZ_AIOPS_POSTGRES_DSN is required when task_db_kind=postgres")
